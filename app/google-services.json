@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "760934165711",
+    "project_id": "super-fitness-765ac",
+    "storage_bucket": "super-fitness-765ac.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760934165711:android:ab04e96dc507b795325bba",
+        "android_client_info": {
+          "package_name": "com.example.superfitness"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUwiLQtNZ6O8a52KV6ZxeBGZsGxQB1y-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
