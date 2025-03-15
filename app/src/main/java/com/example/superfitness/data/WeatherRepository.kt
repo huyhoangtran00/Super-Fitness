@@ -22,6 +22,7 @@ class WeatherRepositoryImpl @Inject constructor(
                 lat = lat,
                 long = long
             )
+            Log.d(TAG, "getWeatherData: result = $result")
             Resource.Success(
                 result.toWeatherInfo()
             )

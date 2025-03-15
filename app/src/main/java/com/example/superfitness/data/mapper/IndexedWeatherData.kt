@@ -90,6 +90,7 @@ fun WeatherDto.toWeatherInfo(): WeatherInfo {
         val hour = if(now.minute < 30) now.hour else now.hour + 1
         it.time.hour == hour
     }
+    Log.d("TAG", "toWeatherInfo: ====> currentWeatherData = $currentWeatherData ")
     return WeatherInfo(
         weatherDataPerDay = weatherDataMap,
         allWeatherDataList = dataWeatherList ,

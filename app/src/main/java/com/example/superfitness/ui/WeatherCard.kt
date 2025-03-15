@@ -1,6 +1,7 @@
 package com.example.superfitness.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
+private val TAG = "WeatherCard"
 @SuppressLint("NewApi", "SuspiciousIndentation")
 @Composable
 fun WeatherCard(
@@ -73,8 +75,10 @@ fun WeatherCard(
             delay(1000)
         }
     }
-
+    Log.d(TAG, "WeatherCard: ====> VAO1 = ${state.weatherInfo?.currentWeatherData}")
+    Log.d(TAG, "WeatherCard: ====> VAO2 = ${forecastState.weatherInfoList}")
     if (state.weatherInfo?.currentWeatherData != null && forecastState.weatherInfoList != null) {
+        Log.d(TAG, "WeatherCard: ===> VAO  ")
         val data = state.weatherInfo.currentWeatherData
         val forecastWeatherList = forecastState.weatherInfoList
         val resultDataMap = forecastWeatherList.map { Pair(Utils.getDayOfWeekFromDate(it.first), it.second) }
