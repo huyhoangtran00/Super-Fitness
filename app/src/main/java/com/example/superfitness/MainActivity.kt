@@ -1,56 +1,108 @@
 package com.example.superfitness
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.LiveData
-import com.example.superfitness.data.local.db.AppDatabase
-import com.example.superfitness.data.local.db.dao.UserProfileDao
-import com.example.superfitness.data.repository.UserProfileRepository
 import com.example.superfitness.ui.theme.SuperFitnessTheme
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
-import com.example.superfitness.viewmodel.UserProfileViewModelFactory
 import com.example.superfitness.data.local.db.entity.UserProfile
+import com.example.superfitness.ui.WeatherCard
+import com.example.superfitness.viewmodel.WeatherViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private lateinit var userProfileViewModel: UserProfileViewModel
 
+    private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+    private val weatherViewModel by viewModels<WeatherViewModel>()
+
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+
+        permissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
+            weatherViewModel.loadWeatherInfo()
+            weatherViewModel.loadForecastWeatherInfo()
+        }
+        permissionLauncher.launch(arrayOf(
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        ))
         setContent {
             SuperFitnessTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Transparent)
+                        ) {
+                            WeatherCard(
+                                state = weatherViewModel.state,
+                                forecastState = weatherViewModel.stateForecastWeather
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                        }
+                        if(weatherViewModel.state.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                        weatherViewModel.state.error?.let { error ->
+                            Text(
+                                text = error,
+                                color = Color.Red,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
                 }
             }
         }
 
-        // Khởi tạo AppDatabase và UserProfileRepository
-        val db = AppDatabase.getDatabase(this)
-        val userProfileDao: UserProfileDao = db.userProfileDao()
-        val userProfileRepository = UserProfileRepository(userProfileDao)
-
-        // Khởi tạo UserProfileViewModel thông qua ViewModelProvider và ViewModelFactory
-        val factory = UserProfileViewModelFactory(userProfileRepository)
-        userProfileViewModel = ViewModelProvider(this, factory).get(UserProfileViewModel::class.java)
-
-        testDatabase()
+//        // Khởi tạo AppDatabase và UserProfileRepository
+//        val db = AppDatabase.getDatabase(this)
+//        val userProfileDao: UserProfileDao = db.userProfileDao()
+//        val userProfileRepository = UserProfileRepository(userProfileDao)
+//
+//        // Khởi tạo UserProfileViewModel thông qua ViewModelProvider và ViewModelFactory
+//        val factory = UserProfileViewModelFactory(userProfileRepository)
+//        userProfileViewModel = ViewModelProvider(this, factory).get(UserProfileViewModel::class.java)
+//
+//        testDatabase()
     }
 
     private fun testDatabase() {

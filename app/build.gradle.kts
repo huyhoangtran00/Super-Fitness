@@ -1,7 +1,8 @@
 plugins {
     id("com.google.gms.google-services")
-    id("kotlin-kapt")  // Đảm bảo rằng bạn đã thêm dòng này để sử dụng KAPT
-
+//    id("kotlin-kapt")  // Đảm bảo rằng bạn đã thêm dòng này để sử dụng KAPT
+    id("com.google.devtools.ksp")
+    id("dagger.hilt.android.plugin")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
@@ -45,7 +46,11 @@ android {
 
 
 }
-
+val hiltVersion by extra("2.54")
+val hiltCompilerVersion by extra("1.2.0")
+val activityVersion by extra("1.9.3")
+val composeNavigationVersion by extra("2.8.5")
+val composeHiltNavigationVersion by extra("1.2.0")
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
@@ -53,7 +58,7 @@ dependencies {
 
     // Room dependencies
     implementation ("androidx.room:room-runtime:2.6.1")
-    kapt( "androidx.room:room-compiler:2.6.1")
+//    kapt( "androidx.room:room-compiler:2.6.1")
     implementation( "androidx.room:room-ktx:2.6.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -73,4 +78,23 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.charts)
+    implementation(libs.okhttp)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
+    implementation("androidx.activity:activity-compose:$activityVersion")
+    implementation("androidx.navigation:navigation-compose:$composeNavigationVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:$composeHiltNavigationVersion")
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    //Hilt
+    ksp("androidx.hilt:hilt-compiler:$hiltCompilerVersion")
+    // Retrofit
+    implementation( "com.squareup.retrofit2:retrofit:2.9.0")
+    implementation( "com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation( "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3")
 }
