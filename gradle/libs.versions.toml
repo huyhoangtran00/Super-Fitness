@@ -16,9 +16,11 @@ okhttp = "4.12.0"
 roomCommon = "2.6.1"
 roomKtx = "2.6.1"
 appcompat = "1.7.0"
+roomRuntime = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 charts = { module = "com.github.tehras:charts", version.ref = "charts" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }

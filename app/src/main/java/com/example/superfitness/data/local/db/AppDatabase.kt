@@ -32,31 +32,4 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun waterIntakeDao(): WaterIntakeDao
     abstract fun weatherCacheDao(): WeatherCacheDao
 
-    companion object {
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
-
-        // Thêm log vào đoạn mã này để theo dõi
-        fun getDatabase(context: Context): AppDatabase {
-            // Kiểm tra nếu INSTANCE là null và log thông báo
-            Log.d("AppDatabase", "Attempting to get database instance.")
-
-            return INSTANCE ?: synchronized(this) {
-                Log.d("AppDatabase", "Creating new database instance.")
-                val instance = try {
-                    Room.databaseBuilder(
-                        context.applicationContext,
-                        AppDatabase::class.java,
-                        "super_fitness_database"
-                    ).build()
-                } catch (e: Exception) {
-                    // Log lỗi nếu việc tạo database gặp vấn đề
-                    Log.e("AppDatabase", "Error creating database: ${e.message}")
-                    throw e  // Ném lại ngoại lệ sau khi log
-                }
-                INSTANCE = instance
-                instance
-            }
-        }
-    }
 }
