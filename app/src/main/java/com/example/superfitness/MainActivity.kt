@@ -123,6 +123,7 @@ class MainActivity : ComponentActivity() {
         })
     }
 }
+
 @Composable
 fun MainScreen(viewModel: UserProfileViewModel, weatherViewModel: WeatherViewModel) {
     val navController = rememberNavController()
