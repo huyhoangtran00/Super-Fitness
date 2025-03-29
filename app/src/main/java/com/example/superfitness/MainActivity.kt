@@ -27,10 +27,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.superfitness.data.local.db.AppDatabase
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.repository.UserProfileRepository
+import com.example.superfitness.ui.LineChartScreen
+import com.example.superfitness.ui.screens.FitnessData
 import com.example.superfitness.ui.theme.SuperFitnessTheme
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import com.example.superfitness.viewmodel.UserProfileViewModelFactory
 import com.example.superfitness.ui.screens.UserProfileInputScreen
+import com.example.superfitness.ui.screens.WaterTrackerScreen
+import com.example.superfitness.ui.screens.WorkoutCalendar
 
 class MainActivity : ComponentActivity() {
     private lateinit var userProfileViewModel: UserProfileViewModel
@@ -38,6 +42,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
 
         val db = AppDatabase.getDatabase(this)
         val userProfileDao: UserProfileDao = db.userProfileDao()
@@ -62,14 +67,21 @@ fun MainScreen(viewModel: UserProfileViewModel) {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = "home",
+            startDestination = "setting",
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("home") { HomeScreen() }
             composable("activity") { ActivityScreen() }
             composable("water") { UserProfileInputScreen(viewModel) }
             composable("weather") {  }
-            composable("setting") { ActivityScreen() }
+            composable("setting") {
+                val sampleData = listOf(
+                    FitnessData("20/03/2025", 1),
+                    FitnessData("21/03/2025", 0),
+                    FitnessData("22/03/2025", 2)
+                )
+                WorkoutCalendar(sampleData)
+            }
 
             // home thi chieu tien do record ->
             // bat dau -> muc tieu 5kmmm
