@@ -14,3 +14,5 @@ data class UserProfile(
     val bmi: Float,
     val goal: String
 )
+
+
