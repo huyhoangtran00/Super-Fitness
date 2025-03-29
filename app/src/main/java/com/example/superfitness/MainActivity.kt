@@ -4,19 +4,27 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
+
+import androidx.compose.material3.Icon
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.LocalDrink
+import androidx.compose.material.icons.filled.DirectionsRun
+
+
+
+import androidx.compose.runtime.Composable
+
+
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
@@ -27,7 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.superfitness.data.local.db.AppDatabase
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.repository.UserProfileRepository
-import com.example.superfitness.ui.theme.SuperFitnessTheme
+import com.example.superfitness.ui.screens.WaterTrackingApp
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import com.example.superfitness.viewmodel.UserProfileViewModelFactory
 import com.example.superfitness.ui.screens.UserProfileInputScreen
@@ -46,7 +54,7 @@ class MainActivity : ComponentActivity() {
         userProfileViewModel = ViewModelProvider(this, factory).get(UserProfileViewModel::class.java)
 
         setContent {
-            SuperFitnessTheme {
+            MaterialTheme {
                 MainScreen(userProfileViewModel)
             }
         }
@@ -62,14 +70,15 @@ fun MainScreen(viewModel: UserProfileViewModel) {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = "home",
+            startDestination = "record",
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable("home") { HomeScreen() }
-            composable("activity") { ActivityScreen() }
-            composable("water") { UserProfileInputScreen(viewModel) }
-            composable("weather") {  }
-            composable("setting") { ActivityScreen() }
+            composable("record") { UserProfileInputScreen(viewModel) }
+            composable("water") { WaterTrackingApp() }
+            composable("activity") { UserProfileInputScreen(viewModel) }
+            composable("weather") { UserProfileInputScreen(viewModel) }
+            composable("settings") { UserProfileInputScreen(viewModel) }
+
 
             // home thi chieu tien do record ->
             // bat dau -> muc tieu 5kmmm
@@ -82,91 +91,49 @@ fun MainScreen(viewModel: UserProfileViewModel) {
 
 @Composable
 fun CustomBottomNavigationBar(navController: NavHostController) {
+    // ... (phần khai báo navBackStackEntry giữ nguyên)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    NavigationBar { // Dùng NavigationBar của M3 thay cho Row
         // Trang chủ
-        Column(
-            modifier = Modifier
-                .clickable {
-                    navController.navigate("home") {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = "Trang chủ",
-                tint = if (currentRoute == "home") Color.Yellow else Color.White
-            )
-            Text(
-                text = "Trang chủ",
-                color = if (currentRoute == "home") Color.Yellow else Color.White,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Home, contentDescription = "Trang chủ") },
+            label = { Text("Trang chủ") },
+            selected = currentRoute == "record",
+            onClick = { navController.navigate("record") }
+        )
 
         // Hoạt động
-        Column(
-            modifier = Modifier
-                .clickable {
-                    navController.navigate("activity") {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = "Hoạt động",
-                tint = if (currentRoute == "activity") Color.Yellow else Color.White
-            )
-            Text(
-                text = "Hoạt động",
-                color = if (currentRoute == "activity") Color.Yellow else Color.White,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.LocalDrink, contentDescription = "Water Reminder") },
+            label = { Text("Drink Water") },
+            selected = currentRoute == "water",
+            onClick = { navController.navigate("water")}
+        )
 
-        // Hồ sơ
-        Column(
-            modifier = Modifier
-                .clickable {
-                    navController.navigate("profile") {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                }
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Hồ sơ",
-                tint = if (currentRoute == "profile") Color.Yellow else Color.White
-            )
-            Text(
-                text = "Hồ sơ",
-                color = if (currentRoute == "profile") Color.Yellow else Color.White,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.DirectionsRun, contentDescription = "Activity") },
+            label = { Text("Activity") },
+            selected = currentRoute == "activity",
+            onClick = {  navController.navigate("activity")}
+        )
+
+
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.WbSunny, contentDescription = "Weather") },
+            label = { Text("Weather") },
+            selected = currentRoute == "weather",
+            onClick = {  navController.navigate("weather")}
+        )
+
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
+            label = { Text("Setting") },
+            selected = currentRoute == "settings",
+            onClick = {  navController.navigate("settings")}
+        )
     }
 }
-
 // Màn hình Trang chủ
 @Composable
 fun HomeScreen() {
@@ -205,79 +172,3 @@ fun ActivityScreen() {
     }
 }
 
-// Màn hình Hồ sơ (Tích hợp từ UserProfileInputScreen)
-@Composable
-fun UserProfileInputScreen(viewModel: UserProfileViewModel) {
-    var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("") }
-    var height by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
-    var goal by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Hồ sơ sức khỏe", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Họ và tên") }
-        )
-        OutlinedTextField(
-            value = age,
-            onValueChange = { age = it },
-            label = { Text("Tuổi") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-        OutlinedTextField(
-            value = gender,
-            onValueChange = { gender = it },
-            label = { Text("Giới tính") }
-        )
-        OutlinedTextField(
-            value = height,
-            onValueChange = { height = it },
-            label = { Text("Chiều cao (cm)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-        OutlinedTextField(
-            value = weight,
-            onValueChange = { weight = it },
-            label = { Text("Cân nặng (kg)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-        OutlinedTextField(
-            value = goal,
-            onValueChange = { goal = it },
-            label = { Text("Mục tiêu sức khỏe") }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            val bmi = weight.toFloatOrNull()?.let { w ->
-                height.toFloatOrNull()?.let { h -> w / ((h / 100) * (h / 100)) }
-            } ?: 0f
-            viewModel.insertUser(
-                com.example.superfitness.data.local.db.entity.UserProfile(
-                    id = 0, // Room sẽ tự động sinh ID
-                    name = name,
-                    age = age.toIntOrNull() ?: 0,
-                    gender = gender,
-                    height = height.toFloatOrNull() ?: 0f,
-                    weight = weight.toFloatOrNull() ?: 0f,
-                    bmi = bmi,
-                    goal = goal
-                )
-            )
-        }) {
-            Text("Lưu hồ sơ")
-        }
-    }
-}

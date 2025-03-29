@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 
 
-class UserProfileViewModel(private val userProfileRepository: UserProfileRepository) : ViewModel() {
+open class UserProfileViewModel(private val userProfileRepository: UserProfileRepository) : ViewModel() {
 
     // Lấy tất cả người dùng từ repository
     fun getAllUsers(): LiveData<List<UserProfile>> {
