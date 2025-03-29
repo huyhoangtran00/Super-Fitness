@@ -134,41 +134,5 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
         )
     }
 }
-// Màn hình Trang chủ
-@Composable
-fun HomeScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Trang chủ", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Số bước chân hôm nay: 5,000", style = MaterialTheme.typography.bodyLarge)
-        Text("Thời tiết: 28°C, Nắng", style = MaterialTheme.typography.bodyLarge)
-        Text("Nhắc nhở uống nước: Còn 1.5L", style = MaterialTheme.typography.bodyLarge)
-    }
-}
 
-// Màn hình Hoạt động
-@Composable
-fun ActivityScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Hoạt động thể chất", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Số bước chân: 5,000", style = MaterialTheme.typography.bodyLarge)
-        Text("Chạy bộ: 3 km, 300 kcal", style = MaterialTheme.typography.bodyLarge)
-        Button(onClick = { /* TODO: Mở danh sách bài tập */ }) {
-            Text("Xem bài tập")
-        }
-    }
-}
 
