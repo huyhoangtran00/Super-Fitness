@@ -22,6 +22,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        dataBinding = true
+        viewBinding = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -50,10 +55,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
 
-
     // Room dependencies
     implementation ("androidx.room:room-runtime:2.6.1")
     kapt( "androidx.room:room-compiler:2.6.1")
+    implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation( "androidx.room:room-ktx:2.6.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
