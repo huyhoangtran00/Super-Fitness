@@ -11,11 +11,14 @@ class ReminderRepository(private val reminderDao: ReminderDao) {
 
     // Thêm nhắc nhở
     suspend fun insertReminder(reminder: Reminder) {
+
+
         reminderDao.insert(reminder)
     }
 
     // Lấy nhắc nhở theo ID
     suspend fun getReminderById(reminderId: Int): Reminder? {
+
         return reminderDao.getReminderById(reminderId)
     }
 
