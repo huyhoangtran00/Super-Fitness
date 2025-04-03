@@ -54,6 +54,7 @@ import com.example.superfitness.data.local.db.entity.UserProfile
 import com.example.superfitness.ui.WeatherCard
 import com.example.superfitness.viewmodel.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import com.example.superfitness.viewmodel.UserProfileViewModelFactory
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
