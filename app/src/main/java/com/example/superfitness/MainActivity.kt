@@ -1,9 +1,27 @@
 package com.example.superfitness
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,9 +31,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -27,14 +43,27 @@ import androidx.navigation.compose.rememberNavController
 import com.example.superfitness.data.local.db.AppDatabase
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.repository.UserProfileRepository
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
 import com.example.superfitness.ui.theme.SuperFitnessTheme
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
-import com.example.superfitness.viewmodel.UserProfileViewModelFactory
-import com.example.superfitness.ui.screens.UserProfileInputScreen
+import com.example.superfitness.data.local.db.entity.UserProfile
+import com.example.superfitness.ui.WeatherCard
+import com.example.superfitness.viewmodel.WeatherViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     private lateinit var userProfileViewModel: UserProfileViewModel
 
+    private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+    private val weatherViewModel by viewModels<WeatherViewModel>()
+
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -44,6 +73,51 @@ class MainActivity : ComponentActivity() {
         val userProfileRepository = UserProfileRepository(userProfileDao)
         val factory = UserProfileViewModelFactory(userProfileRepository)
         userProfileViewModel = ViewModelProvider(this, factory).get(UserProfileViewModel::class.java)
+
+
+        permissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
+            weatherViewModel.loadWeatherInfo()
+            weatherViewModel.loadForecastWeatherInfo()
+        }
+        permissionLauncher.launch(arrayOf(
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        ))
+        setContent {
+            SuperFitnessTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Transparent)
+                        ) {
+                            WeatherCard(
+                                state = weatherViewModel.state,
+                                forecastState = weatherViewModel.stateForecastWeather
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                        }
+                        if(weatherViewModel.state.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                        weatherViewModel.state.error?.let { error ->
+                            Text(
+                                text = error,
+                                color = Color.Red,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
         setContent {
             SuperFitnessTheme {
