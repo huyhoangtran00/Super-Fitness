@@ -4,8 +4,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.local.db.entity.UserProfile
+import javax.inject.Inject
 
-class UserProfileRepository(private val userProfileDao: UserProfileDao) {
+class UserProfileRepository @Inject constructor(private val userProfileDao: UserProfileDao) {
 
     // Lấy tất cả người dùng
     fun getAllUsers(): LiveData<List<UserProfile>>  {
