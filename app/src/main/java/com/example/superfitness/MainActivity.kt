@@ -120,11 +120,11 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        setContent {
-            SuperFitnessTheme {
-                MainScreen(userProfileViewModel)
-            }
-        }
+//        setContent {
+//            SuperFitnessTheme {
+//                MainScreen(userProfileViewModel)
+//            }
+//        }
     }
 }
 
