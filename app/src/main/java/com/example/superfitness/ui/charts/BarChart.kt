@@ -229,21 +229,11 @@ class RoundedBarChartRenderer(
 
         buffer.feed(dataSet)
         trans.pointValuesToPixel(buffer.buffer)
-
-        val isSingleColor = dataSet.colors.size == 1
-
-        if (isSingleColor) {
-            paint.color = dataSet.color
-        }
+        paint.color = dataSet.color
 
         for (j in 0 until buffer.size() step 4) {
             if (!mViewPortHandler.isInBoundsLeft(buffer.buffer[j + 2])) continue
             if (!mViewPortHandler.isInBoundsRight(buffer.buffer[j])) break
-
-            if (!isSingleColor) {
-                paint.color = dataSet.getColor(j / 4)
-            }
-
             mBarRect.set(
                 buffer.buffer[j],
                 buffer.buffer[j + 1],
