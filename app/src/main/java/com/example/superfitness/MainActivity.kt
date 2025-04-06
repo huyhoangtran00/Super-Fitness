@@ -28,6 +28,7 @@ import com.example.superfitness.data.local.db.AppDatabase
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.repository.UserProfileRepository
 import com.example.superfitness.ui.LineChartScreen
+import com.example.superfitness.ui.charts.BarChart
 import com.example.superfitness.ui.screens.FitnessData
 import com.example.superfitness.ui.theme.SuperFitnessTheme
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
@@ -75,12 +76,7 @@ fun MainScreen(viewModel: UserProfileViewModel) {
             composable("water") { UserProfileInputScreen(viewModel) }
             composable("weather") {  }
             composable("setting") {
-                val sampleData = listOf(
-                    FitnessData("20/03/2025", 1),
-                    FitnessData("21/03/2025", 0),
-                    FitnessData("22/03/2025", 2)
-                )
-                WorkoutCalendar(sampleData)
+                BarChart()
             }
 
             // home thi chieu tien do record ->

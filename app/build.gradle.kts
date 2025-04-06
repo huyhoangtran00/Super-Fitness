@@ -54,7 +54,7 @@ android {
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
-
+    implementation("androidx.compose.material:material:1.5.0")
     // Room dependencies
 
     implementation ("androidx.room:room-runtime:2.6.1")

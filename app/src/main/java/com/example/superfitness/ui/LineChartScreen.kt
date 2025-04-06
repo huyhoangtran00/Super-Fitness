@@ -110,7 +110,7 @@ fun LineChartScreen() {
                         setDrawCircleHole(false)  // Tắt hiệu ứng lỗ tròn
                         setDrawValues(false)      // Không hiển thị số tại các chấm tròn
                         setDrawFilled(true)
-                        fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_fill)
+//                        fillDrawable = ContextCompat.getDrawable(context, R.drawable.gradient_fill)
                     })
 
                     invalidate() // Cập nhật lại biểu đồ
