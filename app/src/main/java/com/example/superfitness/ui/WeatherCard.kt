@@ -44,6 +44,7 @@ import coil3.compose.AsyncImage
 import com.example.superfitness.R
 import com.example.superfitness.common.Utils
 import com.example.superfitness.data.mapper.IndexedWeatherData
+import com.example.superfitness.domain.weather.AirQualityInfo
 import com.example.superfitness.viewmodel.ForecastWeatherState
 import com.example.superfitness.viewmodel.WeatherState
 import kotlinx.coroutines.delay
@@ -62,6 +63,7 @@ private val TAG = "WeatherCard"
 fun WeatherCard(
     state: WeatherState,
     forecastState: ForecastWeatherState,
+    airQualityState: AirQualityInfo
 ) {
 
     var time by remember { mutableStateOf("") }
@@ -96,12 +98,12 @@ fun WeatherCard(
                 .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
             item {
-                Spacer(Modifier.height(60.dp))
+                Spacer(Modifier.height(40.dp))
                 Column(modifier = Modifier.fillMaxSize()) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(230.dp)
+                            .height(320.dp)
                             .background(
                                 Brush.verticalGradient(
                                     colors = listOf(Color(0x44000000), Color(0x55000000)),
@@ -175,17 +177,33 @@ fun WeatherCard(
                                     fontSize = 48.sp
                                 )
 
+                                Spacer(Modifier.height(5.dp))
+                                Image(
+                                    painter = painterResource(id = R.drawable.wind),
+                                    contentDescription = "",
+                                    modifier = Modifier.size(32.dp)
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(text = "${data.windSpeed} m/s", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                                Text(text = "Tốc độ gió", fontSize = 14.sp, color = Color.White)
+                                Spacer(Modifier.height(5.dp))
                                 Text(text = state.address?.getAddressLine(0)?.split(",")?.get(2) ?:
                                 "${state.address?.adminArea}", color = Color(0xFF81D4FA))
                                 Text(text = activities, color = Color(0xFFFFAB91), style = TextStyle(
                                     fontWeight = FontWeight.SemiBold,
                                     fontSize = 20.sp,
                                 ), textAlign = TextAlign.Center)
+
                             }
                         }
                     }
                     Spacer(modifier = Modifier.height(30.dp))
-                    WeatherDetailRow(state, forecastWeatherList[0].second.uvIndex)
+                    Log.d(TAG, "WeatherCard: ====> ${forecastWeatherList.getOrNull(0)} ")
+                    Log.d(TAG, "WeatherCard: ====> ${forecastWeatherList.getOrNull(0)?.first} ")
+                    Log.d(TAG, "WeatherCard: ====> ${forecastWeatherList.getOrNull(0)?.second} ")
+                    WeatherDetailRow(state, forecastWeatherList.getOrNull(0)?.second?.uvIndex ?: 0)
+                    Spacer(modifier = Modifier.height(20.dp))
+                    AirQualityCard(airQualityState)
                     Spacer(modifier = Modifier.height(20.dp))
                     WeatherHourlyForecast(state.weatherInfo.allWeatherDataList)
                     Spacer(modifier = Modifier.height(30.dp))

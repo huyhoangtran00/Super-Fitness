@@ -1,5 +1,6 @@
 package com.example.superfitness.domain.weather
 
+import androidx.room.Ignore
 import java.time.LocalDateTime
 
 data class WeatherData(
@@ -8,7 +9,9 @@ data class WeatherData(
     val pressure: Double,
     val windSpeed: Double,
     val humidity: Double,
-    val weatherType: WeatherType,
+    @Ignore
+    val weatherType: WeatherType ,
+    val code : Int ?= null,
     val visibility : Long,
     val precipitation : Int,
 )

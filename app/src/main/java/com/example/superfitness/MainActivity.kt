@@ -77,6 +77,7 @@ class MainActivity : ComponentActivity() {
         ) {
             weatherViewModel.loadWeatherInfo()
             weatherViewModel.loadForecastWeatherInfo()
+            weatherViewModel.loadAirQualityInfo()
         }
         permissionLauncher.launch(arrayOf(
             android.Manifest.permission.ACCESS_FINE_LOCATION,
@@ -148,7 +149,8 @@ fun MainScreen(viewModel: UserProfileViewModel, weatherViewModel: WeatherViewMod
                     ) {
                         WeatherCard(
                             state = weatherViewModel.state,
-                            forecastState = weatherViewModel.stateForecastWeather
+                            forecastState = weatherViewModel.stateForecastWeather,
+                            airQualityState = weatherViewModel.airQualityState
                         )
                         Spacer(modifier = Modifier.height(16.dp))
 

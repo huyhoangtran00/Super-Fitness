@@ -15,4 +15,12 @@ interface WeatherApi {
         @Query("latitude") lat: Double,
         @Query("longitude") long: Double
     ): ForecastWeatherDto
+
+}
+interface AirQualityApi {
+    @GET("v1/air-quality?hourly=pm10,pm2_5,carbon_dioxide&timezone=Asia%2FBangkok")
+    suspend fun getAirQualityData(
+        @Query("latitude") lat: Double,
+        @Query("longitude") long: Double
+    ): AirQualityDto
 }

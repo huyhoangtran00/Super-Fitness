@@ -86,8 +86,17 @@ fun ForecastWeatherDataDto.toForecastWeatherDataMap():  List<Pair<String,Forecas
 fun WeatherDto.toWeatherInfo(): WeatherInfo {
     val (dataWeatherList , weatherDataMap) = weatherData.toWeatherDataMap()
     val now = LocalDateTime.now()
+    Log.d("TAG", "toWeatherInfo: ===> weatherDataMap = $weatherDataMap")
     val currentWeatherData = weatherDataMap[0]?.find {
-        val hour = if(now.minute < 30) now.hour else now.hour + 1
+        val hour = if(now.minute < 30 ) {
+            now.hour
+        } else  {
+            if (now.hour >= 11) {
+                now.hour
+            }else {
+                now.hour + 1
+            }
+        }
         it.time.hour == hour
     }
     Log.d("TAG", "toWeatherInfo: ====> currentWeatherData = $currentWeatherData ")

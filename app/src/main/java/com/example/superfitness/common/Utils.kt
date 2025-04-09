@@ -9,19 +9,19 @@ object Utils {
 
     fun suggestActivityByCode(weatherCode: Int) : String {
         val activity = when (weatherCode) {
-            0 -> "Trời quang, lý tưởng để chạy bộ hoặc đi dạo!"
-            in 1..3 -> "Trời mây nhẹ, thích hợp đi dã ngoại hoặc chụp ảnh."
+            0 -> "Trời quang, lý tưởng để tập ngoài trời!"
+            in 1..3 -> "Trời mây nhẹ, thích hợp tập ngoài trời."
             45, 48 -> "Sương mù, thử yoga hoặc tập trong nhà."
             in 51..55 -> "Mưa phùn, tập nhẹ nhàng trong nhà."
             in 56..57 -> "Mưa phùn đóng băng, tránh ra ngoài."
-            in 61..65 -> "Mưa, tập aerobic hoặc tăng cường sức khỏe."
+            in 61..65 -> "Mưa, tập tập ngoài trời."
             in 66..67 -> "Mưa đóng băng, giữ ấm và hạn chế ra ngoài."
-            in 71..75 -> "Tuyết, thử trượt tuyết hoặc ngắm cảnh."
+            in 71..75 -> "Tuyết, tập trong nhà."
             77 -> "Tuyết hạt, tập tại nhà hoặc thư giãn."
             in 80..82 -> "Mưa rào, chạy bộ trong nhà hoặc tập gym."
             in 85..86 -> "Tuyết rào, thử yoga hoặc nhảy trong nhà."
-            95 -> "Giông bão, ở nhà và tập cá nhân."
-            in 96..99 -> "Giông kèm mưa đá, giữ an toàn trong nhà."
+            95 -> "Giông bão, tập trong nhà."
+            in 96..99 -> "Giông kèm mưa đá, tập trong nhà."
             else -> "Thời tiết không rõ, thử thiền hoặc đọc sách."
         }
         return activity
