@@ -50,6 +50,17 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
 
+    implementation("com.google.accompanist:accompanist-permissions:0.37.2")
+
+    // Google Maps SDK for Android
+    implementation(libs.places)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+
+    // Google maps Compose
+    implementation(libs.maps.compose)
+    implementation(libs.timber)
+
 
     // Room dependencies
 

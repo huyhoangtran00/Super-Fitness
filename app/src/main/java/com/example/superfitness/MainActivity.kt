@@ -1,6 +1,11 @@
 package com.example.superfitness
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,10 +40,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.superfitness.data.local.db.AppDatabase
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.repository.UserProfileRepository
+import com.example.superfitness.ui.run.RunDestination
+import com.example.superfitness.ui.run.RunScreen
 import com.example.superfitness.ui.screens.WaterTrackingApp
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import com.example.superfitness.viewmodel.UserProfileViewModelFactory
 import com.example.superfitness.ui.screens.UserProfileInputScreen
+import com.example.superfitness.ui.tracking.TrackingDestination
+import com.example.superfitness.ui.tracking.TrackingScreen
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
 class MainActivity : ComponentActivity() {
     private lateinit var userProfileViewModel: UserProfileViewModel
@@ -55,14 +66,28 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
-                MainScreen(userProfileViewModel)
+                MainScreen(
+                    userProfileViewModel,
+                    openSettings = ::openAppSettings
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MainScreen(viewModel: UserProfileViewModel) {
+fun MainScreen(
+    viewModel: UserProfileViewModel,
+    openSettings: () -> Unit
+) {
+    val locationPermissions = rememberMultiplePermissionsState(
+        permissions = listOf(
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    )
+
     val navController = rememberNavController()
 
     Scaffold(
@@ -75,7 +100,18 @@ fun MainScreen(viewModel: UserProfileViewModel) {
         ) {
             composable("record") { UserProfileInputScreen(viewModel) }
             composable("water") { WaterTrackingApp() }
-            composable("activity") { UserProfileInputScreen(viewModel) }
+            composable(route = RunDestination.route) {
+                RunScreen(
+                    locationPermissions = locationPermissions,
+                    navController = navController,
+                    openSettings = openSettings,
+                    modifier = Modifier.fillMaxSize()
+            ) }
+            composable(route = TrackingDestination.route) {
+                TrackingScreen(
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
             composable("weather") { UserProfileInputScreen(viewModel) }
             composable("settings") { UserProfileInputScreen(viewModel) }
 
@@ -114,8 +150,8 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
         NavigationBarItem(
             icon = { Icon(Icons.Filled.DirectionsRun, contentDescription = "Activity") },
             label = { Text("Activity") },
-            selected = currentRoute == "activity",
-            onClick = {  navController.navigate("activity")}
+            selected = currentRoute == RunDestination.route,
+            onClick = {  navController.navigate(route = RunDestination.route)}
         )
 
 
@@ -133,6 +169,13 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
             onClick = {  navController.navigate("settings")}
         )
     }
+}
+
+fun Activity.openAppSettings() {
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    ).also(::startActivity)
 }
 
 
