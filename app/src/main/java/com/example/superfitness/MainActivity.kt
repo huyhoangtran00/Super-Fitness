@@ -1,6 +1,5 @@
 package com.example.superfitness
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -10,28 +9,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.material3.Icon
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.DirectionsRun
-
-
-
 import androidx.compose.runtime.Composable
-
-
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,16 +30,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.superfitness.data.local.db.AppDatabase
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.repository.UserProfileRepository
-import com.example.superfitness.ui.run.RunDestination
-import com.example.superfitness.ui.run.RunScreen
+import com.example.superfitness.ui.screens.run.RunDestination
+import com.example.superfitness.ui.screens.run.RunScreen
 import com.example.superfitness.ui.screens.WaterTrackingApp
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import com.example.superfitness.viewmodel.UserProfileViewModelFactory
 import com.example.superfitness.ui.screens.UserProfileInputScreen
-import com.example.superfitness.ui.tracking.TrackingDestination
-import com.example.superfitness.ui.tracking.TrackingScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
 class MainActivity : ComponentActivity() {
     private lateinit var userProfileViewModel: UserProfileViewModel
@@ -81,12 +68,6 @@ fun MainScreen(
     viewModel: UserProfileViewModel,
     openSettings: () -> Unit
 ) {
-    val locationPermissions = rememberMultiplePermissionsState(
-        permissions = listOf(
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-    )
 
     val navController = rememberNavController()
 
@@ -102,16 +83,9 @@ fun MainScreen(
             composable("water") { WaterTrackingApp() }
             composable(route = RunDestination.route) {
                 RunScreen(
-                    locationPermissions = locationPermissions,
-                    navController = navController,
                     openSettings = openSettings,
                     modifier = Modifier.fillMaxSize()
             ) }
-            composable(route = TrackingDestination.route) {
-                TrackingScreen(
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
             composable("weather") { UserProfileInputScreen(viewModel) }
             composable("settings") { UserProfileInputScreen(viewModel) }
 
@@ -127,9 +101,11 @@ fun MainScreen(
 
 @Composable
 fun CustomBottomNavigationBar(navController: NavHostController) {
-    // ... (phần khai báo navBackStackEntry giữ nguyên)
+    // Get the current back stack entry as State
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    // Fetch the current destination
+    val currentDestination = navBackStackEntry?.destination
+    val currentRoute  = currentDestination?.route
     NavigationBar { // Dùng NavigationBar của M3 thay cho Row
         // Trang chủ
         NavigationBarItem(
@@ -151,7 +127,7 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
             icon = { Icon(Icons.Filled.DirectionsRun, contentDescription = "Activity") },
             label = { Text("Activity") },
             selected = currentRoute == RunDestination.route,
-            onClick = {  navController.navigate(route = RunDestination.route)}
+            onClick = {  navController.navigateSingleTopTo(route = RunDestination.route)}
         )
 
 
@@ -176,6 +152,20 @@ fun Activity.openAppSettings() {
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
         Uri.fromParts("package", packageName, null)
     ).also(::startActivity)
+}
+
+fun NavHostController.navigateSingleTopTo(route: String) {
+    this.navigate(route) {
+        // most only one copy of a destination on the top of the back stack
+        launchSingleTop = true
+        // pop up to the Start destination of the graph
+        popUpTo(
+            this@navigateSingleTopTo.graph.findStartDestination().id
+        ) {
+            saveState = true
+        }
+        restoreState = true
+    }
 }
 
 
