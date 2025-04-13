@@ -23,7 +23,7 @@ import com.example.superfitness.data.local.db.entity.WeatherCache
         WeatherCache::class,
         Reminder::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -48,7 +48,7 @@ abstract class AppDatabase : RoomDatabase() {
                         context.applicationContext,
                         AppDatabase::class.java,
                         "super_fitness_database"
-                    ).build()
+                    ).fallbackToDestructiveMigration().build()
                 } catch (e: Exception) {
                     // Log lỗi nếu việc tạo database gặp vấn đề
                     Log.e("AppDatabase", "Error creating database: ${e.message}")

@@ -9,5 +9,6 @@ data class StepRecord(
     val date: String,        // Định dạng: "yyyy-MM-dd"
     val steps: Int,
     val distance: Float,     // Số km đã đi
-    val calories: Float
+    val calories: Float,
+    val duration: String? = null
 )

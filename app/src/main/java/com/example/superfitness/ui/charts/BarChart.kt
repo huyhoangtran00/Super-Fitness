@@ -1,24 +1,21 @@
 package com.example.superfitness.ui.charts
 
-import android.content.Context
 import android.graphics.Canvas
 import android.graphics.RectF
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.superfitness.data.local.db.entity.StepRecord
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -41,14 +39,29 @@ import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Transformer
 import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+// Định nghĩa ChartData làm kiểu chung
+sealed interface ChartData {
+    val date: String
+    val value: Float
+}
+
+data class RunData(override val date: String, override val value: Float) : ChartData // Đổi kilometers thành value
+data class WaterData(override val date: String, override val value: Float) : ChartData // Đổi amounts thành value
 
 @Composable
-fun BarChart(modifier: Modifier = Modifier) {
+fun BarChart(
+    stepData: List<RunData>,
+    waterData: List<WaterData>,
+) {
     val context = LocalContext.current
-    var selectedData by remember { mutableStateOf(runDataList1) }
-    var isFirstIconSelected by remember { mutableStateOf(true) }
+    var selectedData by remember { mutableStateOf<List<ChartData>>(stepData) }
+    var isStepDataSelected by remember { mutableStateOf(true) }
+
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .background(
@@ -65,24 +78,24 @@ fun BarChart(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(id = android.R.drawable.ic_menu_recent_history), // Icon 1
-                contentDescription = "Run Data List 1",
-                tint = if (isFirstIconSelected) Color.White else Color.Gray,
+                painter = painterResource(id = android.R.drawable.ic_menu_info_details),
+                contentDescription = "Step Data",
+                tint = if (isStepDataSelected) Color.White else Color.Gray,
                 modifier = Modifier
                     .padding(end = 16.dp)
                     .clickable {
-                        selectedData = runDataList1
-                        isFirstIconSelected = true
+                        selectedData = stepData
+                        isStepDataSelected = true
                     }
             )
             Icon(
-                painter = painterResource(id = android.R.drawable.ic_menu_today),
-                contentDescription = "Run Data List 2",
-                tint = if (!isFirstIconSelected) Color.White else Color.Gray,
+                painter = painterResource(id = android.R.drawable.ic_menu_agenda),
+                contentDescription = "Water Data",
+                tint = if (!isStepDataSelected) Color.White else Color.Gray,
                 modifier = Modifier
                     .clickable {
-                        selectedData = runDataList2
-                        isFirstIconSelected = false
+                        selectedData = waterData
+                        isStepDataSelected = false
                     }
             )
         }
@@ -92,11 +105,11 @@ fun BarChart(modifier: Modifier = Modifier) {
                 .height(300.dp),
             factory = { ctx ->
                 BarChart(ctx).apply {
-                    setupBarChart(this, selectedData)
+                    setupBarChart(this, selectedData, isStepDataSelected)
                 }
             },
             update = { barChart ->
-                setupBarChart(barChart, selectedData)
+                setupBarChart(barChart, selectedData, isStepDataSelected)
             }
         )
 
@@ -108,24 +121,23 @@ fun BarChart(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 8.dp)
         )
-
     }
-
 }
 
-fun setupBarChart(barChart: BarChart, runDataList: List<RunData>) {
-    val entries = runDataList.mapIndexed { index, runData ->
-        BarEntry(index.toFloat(), runData.kilometers)
+
+fun setupBarChart(barChart: BarChart, dataList: List<ChartData>, isStepData: Boolean) {
+    val entries = dataList.mapIndexed { index, data ->
+        BarEntry(index.toFloat(), data.value)
     }
 
-    val dataSet = BarDataSet(entries, "Kilometers").apply {
-        color = android.graphics.Color.parseColor("#00C853")
-        valueTextColor = android.graphics.Color.parseColor("#00C853")
+    val dataSet = BarDataSet(entries, if (isStepData) "Kilometers" else "Liters").apply {
+        color = if (isStepData) android.graphics.Color.parseColor("#00C853") else android.graphics.Color.parseColor("#0288D1")
+        valueTextColor = if (isStepData) android.graphics.Color.parseColor("#00C853") else android.graphics.Color.parseColor("#0288D1")
         setDrawValues(true)
         valueTextSize = 12f
         valueFormatter = object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
-                return value.toInt().toString()
+                return if (isStepData) String.format("%.0f", value) else String.format("%.0f", value)
             }
         }
     }
@@ -134,7 +146,7 @@ fun setupBarChart(barChart: BarChart, runDataList: List<RunData>) {
         barWidth = 0.6f
     }
 
-    val xAxisLabels = runDataList.map { it.date }
+    val xAxisLabels = dataList.map { it.date.substring(8, 10) } // Hiển thị "dd"
     barChart.xAxis.apply {
         valueFormatter = IndexAxisValueFormatter(xAxisLabels)
         setDrawGridLines(false)
@@ -142,6 +154,7 @@ fun setupBarChart(barChart: BarChart, runDataList: List<RunData>) {
         textColor = android.graphics.Color.WHITE
         position = XAxis.XAxisPosition.BOTTOM
         granularity = 1f
+        setLabelCount(xAxisLabels.size, false)
     }
 
     barChart.axisLeft.apply {
@@ -174,7 +187,6 @@ class RoundedBarChartRenderer(
     animator: com.github.mikephil.charting.animation.ChartAnimator,
     viewPortHandler: ViewPortHandler
 ) : BarChartRenderer(chart, animator, viewPortHandler) {
-
     private var mRadius: Float = 0f
 
     fun setRadius(radius: Float) {
@@ -183,7 +195,6 @@ class RoundedBarChartRenderer(
 
     override fun drawDataSet(c: Canvas, dataSet: IBarDataSet, index: Int) {
         val trans: Transformer = mChart.getTransformer(dataSet.axisDependency)
-
         val paint = mRenderPaint
         val borderPaint = mBarBorderPaint
 
@@ -313,25 +324,3 @@ class RoundedBarChartRenderer(
         c.drawText(valueText, x, y, mValuePaint)
     }
 }
-
-data class RunData(val date: String, val kilometers: Float)
-
-val runDataList1 = listOf(
-    RunData("03-03", 0f),
-    RunData("10-03", 0f),
-    RunData("17-03", 7f),
-    RunData("24-03", 4f),
-    RunData("25-03", 4f),
-    RunData("27-03", 4f),
-    RunData("29-03", 4f),
-)
-
-val runDataList2 = listOf(
-    RunData("03-03", 0f),
-    RunData("10-03", 1f),
-    RunData("17-03", 7f),
-    RunData("24-03", 4f),
-    RunData("25-03", 3f),
-    RunData("27-03", 5f),
-    RunData("29-03", 2f),
-)
