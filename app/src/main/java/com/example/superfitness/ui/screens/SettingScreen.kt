@@ -34,7 +34,6 @@ fun SettingScreen(
     stepRecordViewModel: StepRecordViewModel,
     waterIntakeViewModel: WaterIntakeViewModel
 ) {
-    // Lấy 7 ngày gần nhất
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val calendar = Calendar.getInstance()
     val recentDays = (0 downTo -6).map { offset ->
@@ -44,7 +43,6 @@ fun SettingScreen(
         date
     }.reversed()
 
-    // Lấy dữ liệu bước chân cho biểu đồ
     val stepRecords by stepRecordViewModel.getAllStepRecords().asFlow()
         .collectAsStateWithLifecycle(initialValue = emptyList())
     val stepData = recentDays.map { date ->
@@ -55,7 +53,6 @@ fun SettingScreen(
         )
     }
 
-    // Lấy dữ liệu nước uống
     val waterIntakes by waterIntakeViewModel.allIntakes.asFlow()
         .collectAsStateWithLifecycle(initialValue = emptyList())
     val waterData = recentDays.map { date ->
@@ -65,8 +62,6 @@ fun SettingScreen(
             value = if (intakes.isNotEmpty()) intakes.sumOf { it.amount }.toFloat() / 1000f else 0f
         )
     }
-
-    // Lấy bản ghi của 7 ngày gần nhất (không lọc distance > 0)
     val recentStepRecords = recentDays.map { date ->
         stepRecords.find { it.date == date } ?: StepRecord(
             date = date,
@@ -78,7 +73,6 @@ fun SettingScreen(
     }.sortedByDescending { it.date }
 
     if (stepRecords.isEmpty() && waterIntakes.isEmpty()) {
-        // Hiển thị màn hình chờ nếu dữ liệu chưa sẵn sàng
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -87,7 +81,7 @@ fun SettingScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CircularProgressIndicator(
-                    color = Color.Green // Tùy chỉnh màu của loading indicator
+                    color = Color.Green
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -98,25 +92,21 @@ fun SettingScreen(
             }
         }
     } else {
-        // Hiển thị giao diện chính khi dữ liệu đã sẵn sàng
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Hiển thị biểu đồ
             BarChart(
                 stepData = stepData,
                 waterData = waterData
             )
 
-            // Thêm khoảng cách giữa BarChart và RunHistory
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Hiển thị lịch sử chạy bộ
             RunHistory(recentStepRecords = recentStepRecords)
 
-            Spacer(modifier = Modifier.height(16.dp)) // Thêm khoảng cách dưới cùng
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

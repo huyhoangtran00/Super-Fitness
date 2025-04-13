@@ -1,18 +1,10 @@
 package com.example.superfitness.ui.charts
 
 import android.graphics.Canvas
-import android.graphics.RectF
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DirectionsRun
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Divider
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -25,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.superfitness.data.local.db.entity.StepRecord
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -42,7 +33,6 @@ import com.github.mikephil.charting.utils.ViewPortHandler
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-// Định nghĩa ChartData làm kiểu chung
 sealed interface ChartData {
     val date: String
     val value: Float
@@ -131,13 +121,13 @@ fun setupBarChart(barChart: BarChart, dataList: List<ChartData>, isStepData: Boo
     }
 
     val dataSet = BarDataSet(entries, if (isStepData) "Kilometers" else "Liters").apply {
-        color = if (isStepData) android.graphics.Color.parseColor("#00C853") else android.graphics.Color.parseColor("#0288D1")
-        valueTextColor = if (isStepData) android.graphics.Color.parseColor("#00C853") else android.graphics.Color.parseColor("#0288D1")
+        color = android.graphics.Color.parseColor("#00C853")
+        valueTextColor = android.graphics.Color.parseColor("#00C853")
         setDrawValues(true)
         valueTextSize = 12f
         valueFormatter = object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
-                return if (isStepData) String.format("%.0f", value) else String.format("%.0f", value)
+                return if (isStepData) String.format("%.0f", value) else value.toString()
             }
         }
     }
@@ -146,7 +136,12 @@ fun setupBarChart(barChart: BarChart, dataList: List<ChartData>, isStepData: Boo
         barWidth = 0.6f
     }
 
-    val xAxisLabels = dataList.map { it.date.substring(8, 10) } // Hiển thị "dd"
+    val dateFormatInput = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val dateFormatOutput = SimpleDateFormat("dd/MM", Locale.getDefault())
+    val xAxisLabels = dataList.map { data ->
+        val date = dateFormatInput.parse(data.date)
+        dateFormatOutput.format(date!!)
+    }
     barChart.xAxis.apply {
         valueFormatter = IndexAxisValueFormatter(xAxisLabels)
         setDrawGridLines(false)
