@@ -7,3 +7,6 @@ const val POLYLINE_WIDTH = 8f
 const val MAP_ZOOM = 15f
 
 const val CHANNEL_ID = "TRACK_GOOGLE_MAP"
+
+const val GREEN = "#32a852"
+const val RED = "#fc4430"

@@ -4,32 +4,33 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.superfitness.R
+import com.example.superfitness.data.local.db.entity.RunEntity
 import com.example.superfitness.ui.navigation.NavigationDestination
-import com.example.superfitness.ui.screens.run.components.RunningCard
 import com.example.superfitness.ui.screens.run.components.StartScreenBody
 import com.example.superfitness.ui.screens.run.components.StartScreenBottomBar
 import com.example.superfitness.ui.screens.run.components.StartScreenTopBar
-import com.example.superfitness.ui.screens.run.components.TrackMap
+import com.example.superfitness.ui.screens.run.components.TrackScreenBody
+import com.example.superfitness.ui.screens.run.components.TrackScreenBottomBar
+import com.example.superfitness.ui.screens.run.components.TrackScreenTopBar
+import com.example.superfitness.utils.LocationsUtils
 import com.example.superfitness.viewmodel.AppViewModelProvider
 import com.example.superfitness.viewmodel.RunViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -46,6 +47,7 @@ object RunDestination : NavigationDestination {
 @Composable
 fun RunScreen(
     viewModel: RunViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    onCloseScreenClick: () -> Unit,
     openSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -61,6 +63,13 @@ fun RunScreen(
     val locationUiState = viewModel.locationUiState.collectAsStateWithLifecycle().value
     val isFirstRun = locationUiState.isFirstRun
 
+    val showTrackingScreen = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(400L) // Delay to ensure transition completes
+        showTrackingScreen.value = true
+    }
+
     AnimatedVisibility(isFirstRun) {
         StartScreen(
             modifier = Modifier.fillMaxSize(),
@@ -68,14 +77,26 @@ fun RunScreen(
             isGpsAvailable = isGpsAvailable,
             openSettings = openSettings,
             onStartClick = {
-                performTrackingService(context, locationUiState.isTracking)
-            }
+                performTrackingService(context, Actions.START_OR_RESUME)
+            },
+            onCloseScreenClick = onCloseScreenClick
         )
     }
     AnimatedVisibility(!isFirstRun) {
         TrackingScreen(
             modifier = Modifier.fillMaxSize(),
-            locationUiState = locationUiState
+            locationUiState = locationUiState,
+            onCloseScreenClick = onCloseScreenClick,
+            saveRun = {
+                viewModel.addRun(
+                    RunEntity(
+                        timeStamp = TrackingService.startTime,
+                        distance = locationUiState.distanceInMeters,
+                        duration = locationUiState.durationTimerInMillis,
+                        pathPoints = LocationsUtils.pathPointsToString(locationUiState.pathPoints)
+                    )
+                )
+            }
         )
     }
 }
@@ -86,6 +107,7 @@ fun StartScreen(
     modifier: Modifier = Modifier,
     locationPermissions: MultiplePermissionsState,
     isGpsAvailable: Boolean,
+    onCloseScreenClick: () -> Unit,
     openSettings: () -> Unit,
     onStartClick: () -> Unit
 ) {
@@ -93,12 +115,11 @@ fun StartScreen(
         mutableStateOf(false)
     }
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
     Scaffold(
         topBar = {
             StartScreenTopBar(
-                scrollBehavior = scrollBehavior
+                modifier = Modifier.fillMaxWidth(),
+                onCloseScreenClick = onCloseScreenClick
             )
         },
         bottomBar = {
@@ -113,7 +134,6 @@ fun StartScreen(
                     }
                 },
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
                     .fillMaxWidth()
             )
         }
@@ -133,53 +153,89 @@ fun StartScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackingScreen(
     modifier: Modifier = Modifier,
-    locationUiState: LocationUiState
+    locationUiState: LocationUiState,
+    onCloseScreenClick: () -> Unit,
+    saveRun: () -> Unit
 ) {
     val context = LocalContext.current
-    var isShowRunningCard by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = Unit) {
-        delay(300L)
-        isShowRunningCard = true
-    }
+    var showSaverDialog by rememberSaveable { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-        TrackMap(
-            currentLocation = locationUiState.currentLocation,
-            pathPoints = locationUiState.pathPoints
-        )
-        RunningCard(
+    Scaffold(
+        topBar = {
+            TrackScreenTopBar(
+                isRunning = locationUiState.isTracking,
+                onCloseScreenClick = onCloseScreenClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        bottomBar = {
+            TrackScreenBottomBar(
+                modifier = Modifier.fillMaxWidth(),
+                isRunning = locationUiState.isTracking,
+                onPauseAndResumeClick = {
+                    if(locationUiState.isTracking) {
+                        performTrackingService(context, Actions.PAUSE)
+                    } else {
+                        performTrackingService(context, Actions.START_OR_RESUME)
+                    }
+                },
+                onFinishClick = {
+                    showSaverDialog = true
+                }
+            )
+        },
+        modifier = modifier
+    ) { paddingValues ->
+        TrackScreenBody(
             modifier = Modifier
-                .padding(16.dp),
-            onPlayClicked =
-                { performTrackingService(context, locationUiState.isTracking) },
-            onFinishClicked = {
-
-            },
-            isTracking = locationUiState.isTracking,
+                .padding(paddingValues)
+                .fillMaxSize(),
+            isRunning = locationUiState.isTracking,
+            showSaverDialog = showSaverDialog,
+            currentLocation = locationUiState.currentLocation,
+            pathPoints = locationUiState.pathPoints,
             durationTimerInMillis = locationUiState.durationTimerInMillis,
             distanceInMeters = locationUiState.distanceInMeters,
-            speedInKmH = locationUiState.speedInKmH
+            speedInKmH = locationUiState.speedInKmH,
+            onDismissDialog = { showSaverDialog = false },
+            onStopAndSaveClick = {
+                saveRun()
+                showSaverDialog = false
+                performTrackingService(context, Actions.STOP)
+                onCloseScreenClick()
+            },
+            onStopAndNotSaveClick = {
+                showSaverDialog = false
+                performTrackingService(context, Actions.STOP)
+                onCloseScreenClick()
+            }
         )
+
+    }
+}
+private fun performTrackingService(
+    context: Context,
+    actions: Actions
+) {
+    Intent(context, TrackingService::class.java).also {
+        it.action = actions.name
+        context.startService(it)
     }
 }
 
-private fun performTrackingService(
-    context: Context,
-    isTracking: Boolean
-) {
-    Intent(context, TrackingService::class.java).also {
-        if (!isTracking) {
-            it.action = Actions.START_OR_RESUME.name
-            context.startService(it)
-        } else {
-            it.action = Actions.PAUSE.name
-            context.startService(it)
-        }
-    }
+@Preview
+@Composable
+fun TrackScreenPreview() {
+    TrackingScreen(
+        locationUiState = LocationUiState(),
+        onCloseScreenClick = {},
+        saveRun = {}
+    )
 }
 
 

@@ -16,7 +16,14 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
             RunViewModel(
-                superFitnessApplication().container.locationManager
+                superFitnessApplication().container.locationManager,
+                superFitnessApplication().container.runRepository
+            )
+        }
+
+        initializer {
+            HomeViewModel(
+                superFitnessApplication().container.runRepository
             )
         }
     }

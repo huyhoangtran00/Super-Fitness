@@ -22,4 +22,14 @@ object LocationsUtils {
 
         return result[0].roundToInt()
     }
+
+    fun pathPointsToString(list: List<LatLng>): String {
+        val string = StringBuilder()
+
+        list.forEach {
+            string.append("${it.latitude},${it.longitude}/")
+        }
+
+        return string.toString()
+    }
 }

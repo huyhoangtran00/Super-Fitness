@@ -31,7 +31,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
 @Composable
-fun BoxScope.TrackMap(
+fun TrackMap(
     modifier: Modifier = Modifier,
     currentLocation: LatLng,
     pathPoints: List<LatLng>
@@ -49,8 +49,6 @@ fun BoxScope.TrackMap(
         )
     }
 
-    LoadingCircularProgress(isMapLoaded)
-
     LaunchedEffect(key1 = currentLocation) {
         cameraPositionState.animate(
             CameraUpdateFactory.newCameraPosition(
@@ -62,8 +60,8 @@ fun BoxScope.TrackMap(
     GoogleMap(
         uiSettings = mapUiSettings,
         cameraPositionState = cameraPositionState,
-        onMapLoaded = { isMapLoaded = true},
-        modifier = Modifier.fillMaxSize()
+        onMapLoaded = { isMapLoaded = true },
+        modifier = modifier
     ) {
         val currentMarkerState = rememberMarkerState()
         currentMarkerState.position = currentLocation
@@ -80,23 +78,5 @@ fun BoxScope.TrackMap(
                 width = POLYLINE_WIDTH
             )
         }
-    }
-}
-
-@Composable
-fun BoxScope.LoadingCircularProgress(
-    isMapLoaded: Boolean = false
-) {
-    AnimatedVisibility(
-        visible = isMapLoaded,
-        enter = EnterTransition.None,
-        exit = fadeOut(),
-        modifier = Modifier.matchParentSize()
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .wrapContentSize()
-        )
     }
 }

@@ -43,6 +43,7 @@ class TrackingService : Service() {
 
     companion object {
         private const val TAG = "TrackingService"
+        var startTime = 0L
 
         private val _locationUiState = MutableStateFlow(LocationUiState())
         val locationUiState = _locationUiState
@@ -99,6 +100,7 @@ class TrackingService : Service() {
         if (isFirstRun) {
             isFirstRun = false
             isTracking = true
+            startTime = System.currentTimeMillis()
 
             requestLocationUpdates()
             startTime()
@@ -109,17 +111,15 @@ class TrackingService : Service() {
         }
     }
 
-//    private fun startTracking() {
-//        isTracking = true
-//
-//        requestLocationUpdates()
-//        startTimer()
-//        startForegroundService()
-//    }
-
     private fun pauseTracking() {
         isTracking = false
         isTimerEnabled = false
+
+        locationUiState.update {
+            it.copy(
+                speedInKmH = 0f
+            )
+        }
     }
 
     private fun startTime() {
@@ -144,30 +144,6 @@ class TrackingService : Service() {
 
         }
     }
-
-//    private fun startTimer() {
-//        timer?.cancel()
-//        timer = Timer()
-//
-//        isTimerEnabled = true
-//        startedTime = System.currentTimeMillis()
-//
-//        timer?.schedule(object : TimerTask() {
-//            override fun run() {
-//                _locationUiState.update {
-//                    it.copy(
-//                        durationTimer = getDurationTimer()
-//                    )
-//                }
-//            }
-//        }, 1, 1)
-//    }
-
-//    private fun getDurationTimer(): String {
-//        return TimeUtilFormatter.getTime(
-//            System.currentTimeMillis() - startedTime
-//        )
-//    }
 
     @SuppressLint("MissingPermission")
     private fun requestLocationUpdates() {
@@ -245,7 +221,6 @@ class TrackingService : Service() {
     }
 
     private fun stopTracking() {
-
         isTracking = false
         serviceKilled = true
         isFirstRun = false

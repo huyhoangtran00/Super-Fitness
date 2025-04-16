@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -33,13 +34,16 @@ fun PermissionDialog(
         onDismissRequest = onDismiss,
     ) {
         Surface(
-            modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+            modifier = Modifier.wrapContentSize(),
             shape = MaterialTheme.shapes.large,
             tonalElevation = AlertDialogDefaults.TonalElevation
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Permission required"
+                    text = "Permission required",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -47,7 +51,7 @@ fun PermissionDialog(
                         isPermanentlyDeclined = isPermanentlyDeclined
                     )
                 )
-                HorizontalDivider(modifier = Modifier.fillMaxWidth())
+                HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
                 TextButton(
                     onClick = {
                         if (isPermanentlyDeclined) {

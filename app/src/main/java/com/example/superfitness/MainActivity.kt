@@ -8,6 +8,12 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
@@ -19,6 +25,7 @@ import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -71,8 +78,24 @@ fun MainScreen(
 
     val navController = rememberNavController()
 
+    val bottomBarState = rememberSaveable { (mutableStateOf(true)) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    when(navBackStackEntry?.destination?.route) {
+        "record", "water", "weather", "settings" -> {
+            bottomBarState.value = true
+        }
+        RunDestination.route -> {
+            bottomBarState.value = false
+        }
+    }
+
     Scaffold(
-        bottomBar = { CustomBottomNavigationBar(navController) }
+        bottomBar = { CustomBottomNavigationBar(
+            navController = navController,
+            bottomBarState = bottomBarState
+        ) },
+        contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->
         NavHost(
             navController = navController,
@@ -81,8 +104,19 @@ fun MainScreen(
         ) {
             composable("record") { UserProfileInputScreen(viewModel) }
             composable("water") { WaterTrackingApp() }
-            composable(route = RunDestination.route) {
+            composable(
+                route = RunDestination.route,
+                enterTransition = {
+                    slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = tween(durationMillis = 500)
+                    )
+                },
+            ) {
                 RunScreen(
+                    onCloseScreenClick = {
+                        navController.navigateSingleTopTo("record")
+                    },
                     openSettings = openSettings,
                     modifier = Modifier.fillMaxSize()
             ) }
@@ -100,50 +134,58 @@ fun MainScreen(
 }
 
 @Composable
-fun CustomBottomNavigationBar(navController: NavHostController) {
+fun CustomBottomNavigationBar(
+    navController: NavHostController,
+    bottomBarState: MutableState<Boolean>
+) {
     // Get the current back stack entry as State
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     // Fetch the current destination
     val currentDestination = navBackStackEntry?.destination
     val currentRoute  = currentDestination?.route
-    NavigationBar { // Dùng NavigationBar của M3 thay cho Row
-        // Trang chủ
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.Home, contentDescription = "Trang chủ") },
-            label = { Text("Trang chủ") },
-            selected = currentRoute == "record",
-            onClick = { navController.navigate("record") }
-        )
 
-        // Hoạt động
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.LocalDrink, contentDescription = "Water Reminder") },
-            label = { Text("Drink Water") },
-            selected = currentRoute == "water",
-            onClick = { navController.navigate("water")}
-        )
+    AnimatedVisibility(
+        visible = bottomBarState.value,
+    ) {
+        NavigationBar { // Dùng NavigationBar của M3 thay cho Row
+            // Trang chủ
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.Home, contentDescription = "Trang chủ") },
+                label = { Text("Trang chủ") },
+                selected = currentRoute == "record",
+                onClick = { navController.navigate("record") }
+            )
 
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.DirectionsRun, contentDescription = "Activity") },
-            label = { Text("Activity") },
-            selected = currentRoute == RunDestination.route,
-            onClick = {  navController.navigateSingleTopTo(route = RunDestination.route)}
-        )
+            // Hoạt động
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.LocalDrink, contentDescription = "Water Reminder") },
+                label = { Text("Drink Water") },
+                selected = currentRoute == "water",
+                onClick = { navController.navigate("water")}
+            )
+
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.DirectionsRun, contentDescription = "Activity") },
+                label = { Text("Activity") },
+                selected = currentRoute == RunDestination.route,
+                onClick = {  navController.navigateSingleTopTo(route = RunDestination.route)}
+            )
 
 
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.WbSunny, contentDescription = "Weather") },
-            label = { Text("Weather") },
-            selected = currentRoute == "weather",
-            onClick = {  navController.navigate("weather")}
-        )
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.WbSunny, contentDescription = "Weather") },
+                label = { Text("Weather") },
+                selected = currentRoute == "weather",
+                onClick = {  navController.navigate("weather")}
+            )
 
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
-            label = { Text("Setting") },
-            selected = currentRoute == "settings",
-            onClick = {  navController.navigate("settings")}
-        )
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
+                label = { Text("Setting") },
+                selected = currentRoute == "settings",
+                onClick = {  navController.navigate("settings")}
+            )
+        }
     }
 }
 

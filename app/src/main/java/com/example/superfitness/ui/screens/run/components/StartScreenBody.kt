@@ -6,19 +6,26 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
 import com.example.superfitness.ui.components.LocationPermissionTextProvider
 import com.example.superfitness.ui.components.PermissionDialog
+import com.example.superfitness.utils.GREEN
+import com.example.superfitness.utils.RED
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -41,7 +48,8 @@ fun StartScreenBody(
         position = CameraPosition.fromLatLngZoom(LatLng(36.73723, 3.08647), 3f)
     }
 
-    var showMessage by remember { mutableStateOf(false) }
+    var showMessage by rememberSaveable { mutableStateOf(false) }
+    var showMap by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(isGpsAvailable) {
         if (isGpsAvailable) {
@@ -53,15 +61,30 @@ fun StartScreenBody(
         }
     }
 
+    // Delay map loading to wait for screen animation
+    LaunchedEffect(Unit) {
+        delay(600L) // ⏱️ Adjust as needed
+        showMap = true
+    }
+
 
     if (arePermissionsGranted) {
         Box(
             modifier = modifier
         ) {
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState
-            )
+            if (showMap) {
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                )
+            }
+
             AnimatedVisibility(
                 visible = !isGpsAvailable,
                 enter = slideInVertically(
@@ -73,7 +96,7 @@ fun StartScreenBody(
                     animationSpec = tween(durationMillis = 250, easing = FastOutLinearInEasing)
                 )
             ) {
-                EditMessage("GPS is unavailable")
+                EditMessage("GPS is unavailable", Color(RED.toColorInt()))
             }
             AnimatedVisibility(
                 visible = showMessage,
@@ -86,7 +109,7 @@ fun StartScreenBody(
                     animationSpec = tween(durationMillis = 250, easing = FastOutLinearInEasing)
                 )
             ) {
-                EditMessage("GPS is available")
+                EditMessage("GPS is available", Color(GREEN.toColorInt()))
             }
         }
     } else {
