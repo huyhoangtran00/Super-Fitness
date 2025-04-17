@@ -25,9 +25,8 @@ interface WaterIntakeDao {
     @Query("SELECT * FROM water_intakes WHERE date = :date ORDER BY time DESC")
     fun getIntakesByDate(date: String): Flow<List<WaterIntake>>
 
-    // Lấy tổng lượng nước đã uống trong ngày
     @Query("SELECT SUM(amount) FROM water_intakes WHERE date = :date")
-    fun getDailyTotal(date: String): Flow<Int>
+    fun getDailyTotal(date: String): Flow<Int?> // <- cho phép null
 
     // Lấy bản ghi cụ thể bằng ID
     @Query("SELECT * FROM water_intakes WHERE id = :id")

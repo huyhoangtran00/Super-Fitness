@@ -51,8 +51,17 @@ import com.example.superfitness.ui.tracking.TrackingScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
-class MainActivity : ComponentActivity() {
+
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.superfitness.data.local.db.dao.WaterIntakeDao
+import com.example.superfitness.repository.WaterIntakeRepository
+import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
+import com.example.superfitness.viewmodel.WaterIntakeViewModelFactory
+
+
+ class MainActivity : ComponentActivity() {
     private lateinit var userProfileViewModel: UserProfileViewModel
+    private lateinit var waterIntakeViewModel: WaterIntakeViewModel // Add this line for WaterIntakeViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,13 +70,22 @@ class MainActivity : ComponentActivity() {
         val db = AppDatabase.getDatabase(this)
         val userProfileDao: UserProfileDao = db.userProfileDao()
         val userProfileRepository = UserProfileRepository(userProfileDao)
-        val factory = UserProfileViewModelFactory(userProfileRepository)
-        userProfileViewModel = ViewModelProvider(this, factory).get(UserProfileViewModel::class.java)
+        val user_factory = UserProfileViewModelFactory(userProfileRepository)
+        userProfileViewModel = ViewModelProvider(this, user_factory).get(UserProfileViewModel::class.java)
+        val waterIntakeDao: WaterIntakeDao = db.waterIntakeDao()
 
+
+        val waterIntakeRepository = WaterIntakeRepository(waterIntakeDao)
+
+
+        val water_factory = WaterIntakeViewModelFactory(waterIntakeRepository)
+
+        val waterIntakeViewModel = ViewModelProvider(this, water_factory).get(WaterIntakeViewModel::class.java)
         setContent {
             MaterialTheme {
                 MainScreen(
                     userProfileViewModel,
+                    waterIntakeViewModel,
                     openSettings = ::openAppSettings
                 )
             }
@@ -79,6 +97,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(
     viewModel: UserProfileViewModel,
+    waterIntakeViewModel : WaterIntakeViewModel,
     openSettings: () -> Unit
 ) {
     val locationPermissions = rememberMultiplePermissionsState(
@@ -99,7 +118,7 @@ fun MainScreen(
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("record") { UserProfileInputScreen(viewModel) }
-            composable("water") { WaterTrackingApp() }
+            composable("water") { WaterTrackingApp(waterIntakeViewModel) }
             composable(route = RunDestination.route) {
                 RunScreen(
                     locationPermissions = locationPermissions,

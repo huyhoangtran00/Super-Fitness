@@ -37,20 +37,21 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.example.superfitness.data.local.db.entity.WaterIntake
+import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WaterTrackingApp() {
-    var currentAmount by remember { mutableStateOf(0.6f) }
-    val targetAmount = 2f
-    val waterRecords = remember { mutableStateListOf(
-        WaterRecord(200, "Nước", "15:10"),
-        WaterRecord(200, "Nước", "15:10")
-    )}
+fun WaterTrackingApp(viewModel: WaterIntakeViewModel) {
+    val waterRecords by viewModel.intakesByDate.collectAsState(initial = emptyList())
+    val dailyTotal by viewModel.dailyTotal.collectAsState()
+    val targetAmount = 2000 // 2L = 2000ml
+
     var showReminderDialog by remember { mutableStateOf(false) }
     var reminderEnabled by remember { mutableStateOf(false) }
     var reminderInterval by remember { mutableStateOf(60) } // phút
@@ -103,22 +104,16 @@ fun WaterTrackingApp() {
                     .padding(padding)
             ) {
                 WaterHeader(
-                    currentAmount = currentAmount,
-                    targetAmount = targetAmount
+                    currentAmount = dailyTotal / 1000f, // Chuyển từ ml sang L
+                    targetAmount = targetAmount / 1000f
                 )
 
                 WaterContent(
-                    currentAmount = currentAmount,
-                    targetAmount = targetAmount,
+                    currentAmount = dailyTotal / 1000f,
+                    targetAmount = targetAmount / 1000f,
                     waterRecords = waterRecords,
                     onAddWater = { amount, type ->
-                        val newRecord = WaterRecord(
-                            amount = amount,
-                            type = type,
-                            time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                        )
-                        waterRecords.add(0, newRecord)
-                        currentAmount = (currentAmount + amount / 1000f).coerceAtMost(targetAmount)
+                        viewModel.addIntake(amount, type)
                     }
                 )
             }
@@ -135,6 +130,7 @@ fun WaterTrackingApp() {
         }
     }
 }
+
 @Composable
 fun ReminderSettingsDialog(
     enabled: Boolean,
@@ -273,7 +269,7 @@ fun WaterHeader(
 fun WaterContent(
     currentAmount: Float,
     targetAmount: Float,
-    waterRecords: List<WaterRecord>,
+    waterRecords: List<WaterIntake>,
     onAddWater: (amount: Int, type: String) -> Unit
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
@@ -369,8 +365,8 @@ fun AddWaterDialog(
 
 @Composable
 fun TodayDrinkList(
-    waterRecords: List<WaterRecord>,
-    onEdit: (WaterRecord) -> Unit
+    waterRecords: List<WaterIntake>,
+    onEdit: (WaterIntake) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -409,10 +405,9 @@ fun TodayDrinkList(
         }
     }
 }
-
 @Composable
 fun DrinkItem(
-    record: WaterRecord,
+    record: WaterIntake,
     onEdit: () -> Unit
 ) {
     Card(
@@ -476,7 +471,6 @@ fun DrinkItem(
         }
     }
 }
-
 data class WaterRecord(
     val amount: Int,
     val type: String,
@@ -529,9 +523,3 @@ fun showNotification(context: Context, title: String, message: String) {
     }
 }
 
-
-@Preview
-@Composable
-fun PreviewWaterTrackingApp() {
-    WaterTrackingApp()
-}

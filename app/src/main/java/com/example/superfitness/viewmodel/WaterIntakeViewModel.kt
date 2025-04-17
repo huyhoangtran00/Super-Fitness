@@ -1,80 +1,79 @@
 package com.example.superfitness.ui.viewmodel
 
+import kotlin.text.Typography.dagger
+
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.superfitness.repository.WaterIntakeRepository
 import com.example.superfitness.data.local.db.entity.WaterIntake
-import kotlinx.coroutines.Dispatchers
+import com.example.superfitness.repository.WaterIntakeRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
+import javax.inject.Inject
 
-class WaterIntakeViewModel(private val repository: WaterIntakeRepository) : ViewModel() {
 
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+class WaterIntakeViewModel (
+    private val repository: WaterIntakeRepository
+) : ViewModel() {
 
-    // Get all intakes as Flow converted to LiveData
-    val allIntakes = repository.getAllIntakesFlow().asLiveData()
+    private val currentDate = MutableStateFlow(repository.getCurrentDate())
 
-    // Get today's intakes
-    fun getTodayIntakes() = repository.getIntakesByDateFlow(getCurrentDate()).asLiveData()
+    val dailyTotal: StateFlow<Int> = repository.getDailyTotalFlow()
+        .combine(currentDate) { total, _ -> total ?: 0 }
+        .stateInDefault(0)
 
-    // Get intakes for specific date
-    fun getIntakesByDate(date: String) = repository.getIntakesByDateFlow(date).asLiveData()
 
-    // Get today's total water intake
-    val todayTotal = repository.getDailyTotalFlow(getCurrentDate()).asLiveData()
+    val intakesByDate: StateFlow<List<WaterIntake>> = repository.getIntakesByDateFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+    // Các loại đồ uống trong ngày
+   // val drinkTypes = repository.getDrinkTypesByDate().asLiveData()
 
-    // Get total for specific date
-    fun getDailyTotal(date: String) = repository.getDailyTotalFlow(date).asLiveData()
-
-    // Add new water intake
-    fun addIntake(amount: Int, type: String, customDate: String? = null) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.addIntake(amount, type, customDate)
+    fun addIntake(amount: Int, type: String) {
+        viewModelScope.launch {
+            repository.addIntake(amount, type)
         }
     }
 
-    // Update existing intake
-    fun updateIntake(intake: WaterIntake) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateIntake(intake)
+    fun updateIntake(waterIntake: WaterIntake) {
+        viewModelScope.launch {
+            repository.updateIntake(waterIntake)
         }
     }
 
-    // Delete intake
-    fun deleteIntake(intake: WaterIntake) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteIntake(intake)
+    fun deleteIntake(waterIntake: WaterIntake) {
+        viewModelScope.launch {
+            repository.deleteIntake(waterIntake)
         }
     }
 
-    // Get drink types for today
-    fun getTodayDrinkTypes() = viewModelScope.launch(Dispatchers.IO) {
-        repository.getDrinkTypesByDate(getCurrentDate())
-    }
-
-    // Get drink types for specific date
-    fun getDrinkTypesByDate(date: String) = viewModelScope.launch(Dispatchers.IO) {
-        repository.getDrinkTypesByDate(date)
-    }
-
-    // Clear today's records
-    fun clearTodayRecords() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.clearDayRecords(getCurrentDate())
+    fun getIntakeById(id: Long) {
+        viewModelScope.launch {
+            repository.getIntakeById(id)
         }
     }
 
-    // Clear records for specific date
-    fun clearDateRecords(date: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.clearDayRecords(date)
-        }
+    fun refreshDataForDate(date: String? = null) {
+        currentDate.value = date ?: repository.getCurrentDate()
     }
 
-    private fun getCurrentDate(): String {
-        return dateFormat.format(Date())
+    private fun <T> Flow<T>.stateInDefault(initialValue: T): StateFlow<T> {
+        return this.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly, // hoặc SharingStarted.Lazily
+            initialValue = initialValue
+        )
     }
+
 }

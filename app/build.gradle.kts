@@ -1,6 +1,7 @@
 plugins {
     id("com.google.gms.google-services")
     id("kotlin-kapt")  // Đảm bảo rằng bạn đã thêm dòng này để sử dụng KAPT
+    id ("dagger.hilt.android.plugin") // Thêm plugin Hilt
 
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -49,6 +50,9 @@ android {
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation ("com.google.dagger:hilt-android:2.48")  // Phiên bản mới nhất
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     implementation("com.google.accompanist:accompanist-permissions:0.37.2")
 

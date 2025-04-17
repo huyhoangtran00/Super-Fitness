@@ -26,6 +26,7 @@ import com.example.superfitness.data.local.db.entity.WeatherCache
     version = 1,
     exportSchema = false
 )
+
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userProfileDao(): UserProfileDao
     abstract fun stepRecordDao(): StepRecordDao
@@ -48,11 +49,12 @@ abstract class AppDatabase : RoomDatabase() {
                         context.applicationContext,
                         AppDatabase::class.java,
                         "super_fitness_database"
-                    ).build()
+                    )
+                        .fallbackToDestructiveMigration()  // ✅ thêm dòng này
+                        .build()
                 } catch (e: Exception) {
-                    // Log lỗi nếu việc tạo database gặp vấn đề
                     Log.e("AppDatabase", "Error creating database: ${e.message}")
-                    throw e  // Ném lại ngoại lệ sau khi log
+                    throw e
                 }
                 INSTANCE = instance
                 instance

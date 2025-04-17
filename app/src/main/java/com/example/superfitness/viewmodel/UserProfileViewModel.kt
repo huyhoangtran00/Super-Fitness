@@ -8,10 +8,10 @@ import com.example.superfitness.data.local.db.entity.UserProfile
 import com.example.superfitness.data.repository.UserProfileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-
-open class UserProfileViewModel(private val userProfileRepository: UserProfileRepository) : ViewModel() {
+open class UserProfileViewModel (private val userProfileRepository: UserProfileRepository) : ViewModel() {
 
     // Lấy tất cả người dùng từ repository
     fun getAllUsers(): LiveData<List<UserProfile>> {
