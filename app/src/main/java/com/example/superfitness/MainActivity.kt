@@ -20,32 +20,42 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.superfitness.data.local.db.AppDatabase
+import com.example.superfitness.data.local.db.dao.StepRecordDao
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.local.db.dao.WaterIntakeDao
+import com.example.superfitness.data.local.db.entity.StepRecord
 import com.example.superfitness.data.repository.UserProfileRepository
+import com.example.superfitness.repository.StepRecordRepository
 import com.example.superfitness.repository.WaterIntakeRepository
 import com.example.superfitness.ui.run.RunDestination
 import com.example.superfitness.ui.run.RunScreen
+import com.example.superfitness.ui.screens.SettingScreen
 import com.example.superfitness.ui.screens.UserProfileInputScreen
 import com.example.superfitness.ui.screens.WaterTrackingApp
 import com.example.superfitness.ui.tracking.TrackingDestination
 import com.example.superfitness.ui.tracking.TrackingScreen
+import com.example.superfitness.ui.viewmodel.StepRecordViewModel
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
 import com.example.superfitness.viewmodel.UserProfileViewModelFactory
 import com.example.superfitness.viewmodel.WaterIntakeViewModelFactory
+import com.example.superfitness.viewmodel.StepRecordViewModelFactory
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var userProfileViewModel: UserProfileViewModel
     private lateinit var waterIntakeViewModel: WaterIntakeViewModel
+    private lateinit var stepRecordViewModel: StepRecordViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +67,11 @@ class MainActivity : ComponentActivity() {
         val userFactory = UserProfileViewModelFactory(userProfileRepository)
         userProfileViewModel = ViewModelProvider(this, userFactory).get(UserProfileViewModel::class.java)
 
+        val stepRecordDao: StepRecordDao = db.stepRecordDao()
+        val stepRecordRepository = StepRecordRepository(stepRecordDao)
+        val stepRecordFactory = StepRecordViewModelFactory(stepRecordRepository)
+        stepRecordViewModel = ViewModelProvider(this, stepRecordFactory).get(StepRecordViewModel::class.java)
+
         val waterIntakeDao: WaterIntakeDao = db.waterIntakeDao()
         val waterIntakeRepository = WaterIntakeRepository(waterIntakeDao)
         val waterFactory = WaterIntakeViewModelFactory(waterIntakeRepository)
@@ -67,6 +82,7 @@ class MainActivity : ComponentActivity() {
                 AppContent(
                     userProfileViewModel = userProfileViewModel,
                     waterIntakeViewModel = waterIntakeViewModel,
+                    stepRecordViewModel = stepRecordViewModel,
                     openSettings = ::openAppSettings
                 )
             }
@@ -78,6 +94,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppContent(
     userProfileViewModel: UserProfileViewModel,
+    stepRecordViewModel: StepRecordViewModel,
     waterIntakeViewModel: WaterIntakeViewModel,
     openSettings: () -> Unit
 ) {
@@ -147,7 +164,10 @@ fun AppContent(
                 Box(modifier = Modifier.fillMaxSize())
             }
             composable("settings") {
-                Box(modifier = Modifier.fillMaxSize())
+                SettingScreen(
+                    stepRecordViewModel = stepRecordViewModel,
+                    waterIntakeViewModel = waterIntakeViewModel
+                )
             }
         }
     }
