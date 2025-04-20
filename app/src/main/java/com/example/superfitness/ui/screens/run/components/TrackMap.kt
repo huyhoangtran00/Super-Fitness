@@ -18,11 +18,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.graphics.toColorInt
+import com.example.superfitness.R
+import com.example.superfitness.utils.DrawableConverter
+import com.example.superfitness.utils.GREEN
 import com.example.superfitness.utils.MAP_ZOOM
 import com.example.superfitness.utils.POLYLINE_WIDTH
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
@@ -33,11 +41,12 @@ import com.google.maps.android.compose.rememberMarkerState
 @Composable
 fun TrackMap(
     modifier: Modifier = Modifier,
+    bearing: Float,
     currentLocation: LatLng,
     pathPoints: List<LatLng>
 ) {
-    var isMapLoaded by remember { mutableStateOf(false) }
 
+    var isMapLoaded by remember { mutableStateOf(false) }
     val cameraPositionState = rememberCameraPositionState()
 
     val mapUiSettings by remember {
@@ -48,6 +57,7 @@ fun TrackMap(
             ),
         )
     }
+
 
     LaunchedEffect(key1 = currentLocation) {
         cameraPositionState.animate(
@@ -68,13 +78,19 @@ fun TrackMap(
 
         Marker(
             state = currentMarkerState,
-            anchor = Offset(0.5f, 0.5f)
+            anchor = Offset(0.5f, 0.5f),
+            rotation = bearing,
+            flat = true,
+            icon = DrawableConverter.bitmapDescriptorFromVector(
+                LocalContext.current,
+                R.drawable.arrow,
+                scale = 1.0
+            )
         )
-
         if (pathPoints.size > 1) {
             Polyline(
                 points = pathPoints,
-                color = Color.Green,
+                color = Color(GREEN.toColorInt()),
                 width = POLYLINE_WIDTH
             )
         }

@@ -1,21 +1,15 @@
 package com.example.superfitness.ui.screens.run.components
 
-import android.app.Dialog
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,15 +24,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import com.example.superfitness.utils.DistanceKmFormatter
@@ -57,12 +46,14 @@ fun TrackScreenBody(
     durationTimerInMillis: Long,
     distanceInMeters: Int,
     speedInKmH: Float,
+    bearing: Float,
+    steps: Int,
     onDismissDialog: () -> Unit,
     onStopAndSaveClick: () -> Unit,
     onStopAndNotSaveClick: () -> Unit
 ) {
 
-    val formattedTime = TimeUtilFormatter.getFormattedStopWatchTime(durationTimerInMillis)
+    val formattedTime = TimeUtilFormatter.getStopWatchTime(durationTimerInMillis)
     val formattedDistance = DistanceKmFormatter.metersToKm(distanceInMeters)
     val formattedSpeed = SpeedFormatter.getFormattedSpeedKmH(speedInKmH)
 
@@ -101,11 +92,12 @@ fun TrackScreenBody(
 
             Spacer(modifier = Modifier.height(16.dp))
             TrackMap(
-                currentLocation = currentLocation,
-                pathPoints = pathPoints,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f),
+                bearing = bearing,
+                currentLocation = currentLocation,
+                pathPoints = pathPoints,
             )
             Surface(
                 modifier = Modifier
@@ -117,7 +109,8 @@ fun TrackScreenBody(
                         .fillMaxSize()
                         .padding(16.dp),
                     formattedSpeed = formattedSpeed,
-                    formattedDistance = formattedDistance
+                    formattedDistance = formattedDistance,
+                    steps = steps.toString()
                 )
             }
         }
@@ -135,7 +128,8 @@ fun TrackScreenBody(
 fun TrackingStatistics(
     modifier: Modifier = Modifier,
     formattedSpeed: String,
-    formattedDistance: String
+    formattedDistance: String,
+    steps: String
 ) {
     Row(
         modifier = modifier,
@@ -156,7 +150,7 @@ fun TrackingStatistics(
             HorizontalDivider(modifier = Modifier.width(120.dp))
             Text("PACE", style = MaterialTheme.typography.labelSmall)
             Text(
-                text = "0",
+                text = steps,
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 )

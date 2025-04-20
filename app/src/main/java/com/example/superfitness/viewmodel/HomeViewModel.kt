@@ -22,22 +22,4 @@ class HomeViewModel(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
-
-    /**
-     * Get the selected run
-     */
-    suspend fun getRun(id: Int): RunEntity? {
-        return runRepository
-            .getRun(id)
-            .firstOrNull()
-    }
-
-    /**
-     * Delete a run from database
-     */
-    fun deleteRun(runEntity: RunEntity) {
-        viewModelScope.launch {
-            runRepository.removeRun(runEntity)
-        }
-    }
 }

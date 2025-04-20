@@ -2,6 +2,7 @@ package com.example.superfitness.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -23,6 +24,12 @@ object AppViewModelProvider {
 
         initializer {
             HomeViewModel(
+                superFitnessApplication().container.runRepository
+            )
+        }
+        initializer {
+            RunDetailsViewModel(
+                this.createSavedStateHandle(),
                 superFitnessApplication().container.runRepository
             )
         }

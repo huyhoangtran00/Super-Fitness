@@ -5,7 +5,7 @@ import com.example.superfitness.data.local.db.entity.RunEntity
 import kotlinx.coroutines.flow.Flow
 
 interface RunRepository {
-    fun getRun(id: Int): Flow<RunEntity>
+    fun getRunStream(id: Int): Flow<RunEntity?>
     fun getRunsStream(): Flow<List<RunEntity>>
     suspend fun addRun(runEntity: RunEntity)
     suspend fun removeRun(runEntity: RunEntity)
@@ -13,7 +13,7 @@ interface RunRepository {
 class OfflineRunRepository(
     private val runDao: RunDao
 ) : RunRepository{
-    override fun getRun(id: Int): Flow<RunEntity> =
+    override fun getRunStream(id: Int): Flow<RunEntity?> =
         runDao.getRun(id)
 
     override fun getRunsStream(): Flow<List<RunEntity>> =

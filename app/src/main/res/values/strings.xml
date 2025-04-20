@@ -3,4 +3,6 @@
     <string name="google_maps_key">AIzaSyDp68t6qLlyHEwySzQp-PtJLrp_00gcgxo</string>
     <string name="run">Run Screen</string>
     <string name="tracking">Tracking Screen</string>
+    <string name="details">Details Screen</string>
+    <string name="home"> Home Screen</string>
 </resources>

@@ -202,6 +202,8 @@ fun TrackingScreen(
             durationTimerInMillis = locationUiState.durationTimerInMillis,
             distanceInMeters = locationUiState.distanceInMeters,
             speedInKmH = locationUiState.speedInKmH,
+            bearing = locationUiState.bearing,
+            steps = locationUiState.steps,
             onDismissDialog = { showSaverDialog = false },
             onStopAndSaveClick = {
                 saveRun()
