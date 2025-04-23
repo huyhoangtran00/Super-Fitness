@@ -4,9 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.local.db.entity.UserProfile
-import com.example.superfitness.ui.screens.UserProfileInputScreen
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class UserProfileRepository(private val userProfileDao: UserProfileDao) {
 
