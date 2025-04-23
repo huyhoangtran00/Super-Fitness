@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -61,11 +63,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.superfitness.data.WeatherRepositoryImpl
+import com.example.superfitness.data.local.dao.AirQualityDao
+import com.example.superfitness.data.local.dao.WeatherDao
 import com.example.superfitness.data.local.db.AppDatabase
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.local.db.dao.WaterIntakeDao
+import com.example.superfitness.data.remote.api.AirQualityApi
+import com.example.superfitness.data.remote.api.WeatherApi
+import com.example.superfitness.data.repository.AirQualityRepository
 import com.example.superfitness.data.repository.UserProfileRepository
+import com.example.superfitness.data.repository.WeatherRepository
+import com.example.superfitness.repository.DefaultILocationTracker
 import com.example.superfitness.repository.WaterIntakeRepository
+import com.example.superfitness.ui.WeatherCard
 import com.example.superfitness.ui.run.RunDestination
 import com.example.superfitness.ui.run.RunScreen
 import com.example.superfitness.ui.screens.UserProfileInputScreen
@@ -80,15 +91,18 @@ import com.example.superfitness.viewmodel.WaterIntakeViewModelFactory
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
-import com.example.superfitness.ui.screen.UserProfileInputScreen
+import com.example.superfitness.viewmodel.WeatherViewModelFactory
+import com.google.android.gms.location.LocationServices
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var userProfileViewModel: UserProfileViewModel
     private lateinit var waterIntakeViewModel: WaterIntakeViewModel
+    private lateinit var  weatherViewModel : WeatherViewModel
 
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
-    private val weatherViewModel by viewModels<WeatherViewModel>()
-    private val userProfileViewModel by viewModels<UserProfileViewModel>()
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,6 +120,29 @@ class MainActivity : ComponentActivity() {
         val waterFactory = WaterIntakeViewModelFactory(waterIntakeRepository)
         waterIntakeViewModel = ViewModelProvider(this, waterFactory).get(WaterIntakeViewModel::class.java)
 
+        val connectionManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val weatherApi =  Retrofit.Builder()
+            .baseUrl("https://api.open-meteo.com/")
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
+            .create(WeatherApi::class.java)
+        val weatherDao: WeatherDao = db.weatherDao()
+
+        val weatherRepository = WeatherRepository(weatherApi, weatherDao,connectionManager)
+
+        val airQualityApi = Retrofit.Builder()
+            .baseUrl("https://air-quality-api.open-meteo.com/")
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
+            .create(AirQualityApi::class.java)
+
+        val airQualityDao: AirQualityDao = db.airQualityDao()
+        val airQualityRepository = AirQualityRepository(airQualityApi,airQualityDao,connectionManager)
+        val locationTracker = DefaultILocationTracker(LocationServices.getFusedLocationProviderClient(this), application)
+
+        val weatherFactory = WeatherViewModelFactory(weatherRepository, airQualityRepository, locationTracker)
+        weatherViewModel = ViewModelProvider(this,weatherFactory)[WeatherViewModel::class.java]
+
         permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) {
@@ -122,6 +159,7 @@ class MainActivity : ComponentActivity() {
                 AppContent(
                     userProfileViewModel = userProfileViewModel,
                     waterIntakeViewModel = waterIntakeViewModel,
+                    weatherViewModel = weatherViewModel,
                     openSettings = ::openAppSettings
                 )
             }
@@ -134,6 +172,7 @@ class MainActivity : ComponentActivity() {
 fun AppContent(
     userProfileViewModel: UserProfileViewModel,
     waterIntakeViewModel: WaterIntakeViewModel,
+    weatherViewModel: WeatherViewModel,
     openSettings: () -> Unit
 ) {
     val navController = rememberNavController()

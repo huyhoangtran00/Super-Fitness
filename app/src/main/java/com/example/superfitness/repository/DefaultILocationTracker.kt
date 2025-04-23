@@ -17,7 +17,7 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 
 @ExperimentalCoroutinesApi
-class DefaultILocationTracker @Inject constructor(
+class DefaultILocationTracker(
     private val locationClient: FusedLocationProviderClient,
     private val application: Application
 ): ILocationTracker {
@@ -59,14 +59,19 @@ class DefaultILocationTracker @Inject constructor(
                     return@suspendCancellableCoroutine
                 }
                 addOnSuccessListener { data ->
-                    val geocoder = Geocoder(application, Locale.getDefault())
-                    val addresses = geocoder.getFromLocation(result.latitude, result.longitude, 1)
-                    if (addresses?.isNotEmpty() == true) {
-                        val address = addresses[0]
-                        cont.resume(Pair(address, result))
-                    } else {
+                    kotlin.runCatching {
+                        val geocoder = Geocoder(application, Locale.getDefault())
+                        val addresses = geocoder.getFromLocation(result.latitude, result.longitude, 1)
+                        if (addresses?.isNotEmpty() == true) {
+                            val address = addresses[0]
+                            cont.resume(Pair(address, result))
+                        } else {
+                            cont.resume(Pair(null, data))
+                        }
+                    }.onFailure {
                         cont.resume(Pair(null, data))
                     }
+
                 }
                 addOnFailureListener {
                     cont.resume(null)

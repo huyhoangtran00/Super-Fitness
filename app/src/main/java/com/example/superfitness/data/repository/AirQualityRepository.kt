@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-class AirQualityRepository @Inject constructor(
+class AirQualityRepository (
     private val api: AirQualityApi,
     private val dao: AirQualityDao,
     private val connectivityManager: ConnectivityManager

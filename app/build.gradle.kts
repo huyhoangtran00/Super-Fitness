@@ -1,7 +1,6 @@
 plugins {
     id("com.google.gms.google-services")
     id("kotlin-kapt")  // Đảm bảo rằng bạn đã thêm dòng này để sử dụng KAPT
-    id ("dagger.hilt.android.plugin") // Thêm plugin Hilt
 
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -14,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.superfitness"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -54,10 +53,6 @@ val composeHiltNavigationVersion by extra("1.2.0")
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation ("com.google.dagger:hilt-android:2.48")  // Phiên bản mới nhất
-    kapt("com.google.dagger:hilt-android-compiler:2.48")
-    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-
     implementation("com.google.accompanist:accompanist-permissions:0.37.2")
 
     // Google Maps SDK for Android
@@ -72,11 +67,11 @@ dependencies {
 
     // Room dependencies
 
-    implementation ("androidx.room:room-runtime:2.6.1")
+    implementation ("androidx.room:room-runtime:2.7.0")
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
-    kapt( "androidx.room:room-compiler:2.6.1")
-    implementation( "androidx.room:room-ktx:2.6.1")
+    kapt( "androidx.room:room-compiler:2.7.0")
+    implementation( "androidx.room:room-ktx:2.7.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
