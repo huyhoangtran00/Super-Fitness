@@ -13,9 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +48,7 @@ data class WaterData(override val date: String, override val value: Float) : Cha
 fun BarChart(
     stepData: List<RunData>,
     waterData: List<WaterData>,
+    onSelectionChange: (Boolean) -> Unit
 ) {
     val context = LocalContext.current
     var selectedData by remember { mutableStateOf<List<ChartData>>(stepData) }
@@ -57,8 +58,13 @@ fun BarChart(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
+            .shadow(
+                elevation = 8.dp, // Độ cao của bóng
+                shape = RoundedCornerShape(16.dp), // Bo góc của bóng
+                clip = true // Đảm bảo bóng không bị cắt
+            )
             .background(
-                color = Color.Black,
+                color = Color.White,
                 shape = RoundedCornerShape(16.dp)
             ),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -73,22 +79,24 @@ fun BarChart(
             Icon(
                 imageVector = Icons.Filled.DirectionsRun,
                 contentDescription = "Step Data",
-                tint = if (isStepDataSelected) Color.White else Color.Gray,
+                tint = if (isStepDataSelected) Color.Black else Color.Gray,
                 modifier = Modifier
                     .padding(end = 16.dp)
                     .clickable {
                         selectedData = stepData
                         isStepDataSelected = true
+                        onSelectionChange(true)
                     }
             )
             Icon(
                 imageVector = Icons.Filled.WaterDrop,
                 contentDescription = "Water Data",
-                tint = if (!isStepDataSelected) Color.White else Color.Gray,
+                tint = if (!isStepDataSelected) Color.Black else Color.Gray,
                 modifier = Modifier
                     .clickable {
                         selectedData = waterData
                         isStepDataSelected = false
+                        onSelectionChange(false)
                     }
             )
         }
@@ -130,7 +138,7 @@ fun setupBarChart(barChart: BarChart, dataList: List<ChartData>, isStepData: Boo
         valueTextSize = 12f
         valueFormatter = object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
-                return if (isStepData) String.format("%.0f", value) else value.toString()
+                return String.format("%.0f", value)
             }
         }
     }

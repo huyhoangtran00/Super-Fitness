@@ -23,7 +23,7 @@ import com.example.superfitness.data.local.db.entity.WeatherCache
         WeatherCache::class,
         Reminder::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 

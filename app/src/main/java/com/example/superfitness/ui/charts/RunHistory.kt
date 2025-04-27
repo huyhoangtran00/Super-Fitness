@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,15 +27,20 @@ fun RunHistory(recentStepRecords: List<StepRecord>) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
+                .shadow(
+                    elevation = 8.dp, // Độ cao của bóng
+                    shape = RoundedCornerShape(16.dp), // Bo góc của bóng
+                    clip = true // Đảm bảo bóng không bị cắt
+                )
                 .background(
-                    color = Color.Black,
+                    color = Color.White,
                     shape = RoundedCornerShape(16.dp)
                 ),
             horizontalAlignment = Alignment.Start
         ) {
             Text(
                 text = "Lịch sử chạy bộ",
-                color = Color.White,
+                color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
@@ -83,20 +89,20 @@ fun RunningHistoryItem(record: StepRecord) {
         ) {
             Text(
                 text = "${String.format("%.1f", record.distance)} km",
-                color = Color.White,
+                color = Color.Black,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = "Chạy bộ",
-                color = Color.Gray,
+                color = Color.Black,
                 fontSize = 12.sp
             )
 
             Text(
                 text = "${record.duration}   ${String.format("%.0f", record.distance)} km   ${String.format("%.0f", record.calories)} calo",
-                color = Color.White,
+                color = Color.Black,
                 fontSize = 12.sp
             )
         }

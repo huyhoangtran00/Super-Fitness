@@ -11,6 +11,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,10 +22,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.asFlow
 import com.example.superfitness.data.local.db.entity.StepRecord
+import com.example.superfitness.data.local.db.entity.WaterIntake
 import com.example.superfitness.ui.charts.BarChart
 import com.example.superfitness.ui.charts.RunData
 import com.example.superfitness.ui.charts.RunHistory
 import com.example.superfitness.ui.charts.WaterData
+import com.example.superfitness.ui.charts.WaterHistory
 import com.example.superfitness.ui.viewmodel.StepRecordViewModel
 import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
 import java.text.SimpleDateFormat
@@ -59,9 +64,10 @@ fun SettingScreen(
         val intakes = waterIntakes.filter { it.date == date }
         WaterData(
             date = date,
-            value = if (intakes.isNotEmpty()) intakes.sumOf { it.amount }.toFloat() / 1000f else 0f
+            value = if (intakes.isNotEmpty()) intakes.sumOf { it.amount }.toFloat() else 0f
         )
     }
+
     val recentStepRecords = recentDays.map { date ->
         stepRecords.find { it.date == date } ?: StepRecord(
             date = date,
@@ -71,6 +77,12 @@ fun SettingScreen(
             duration = "00:00:00"
         )
     }.sortedByDescending { it.date }
+
+    val recentWaterIntakes = recentDays.map { date ->
+        waterIntakes.filter { it.date == date }
+    }.flatten().sortedByDescending { it.date }.take(7)
+
+    var isStepDataSelected by remember { mutableStateOf(true) }
 
     if (stepRecords.isEmpty() && waterIntakes.isEmpty()) {
         Box(
@@ -99,12 +111,19 @@ fun SettingScreen(
         ) {
             BarChart(
                 stepData = stepData,
-                waterData = waterData
+                waterData = waterData,
+                onSelectionChange = { isSelected ->
+                    isStepDataSelected = isSelected
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            RunHistory(recentStepRecords = recentStepRecords)
+            if (isStepDataSelected) {
+                RunHistory(recentStepRecords = recentStepRecords)
+            } else {
+                WaterHistory(recentWaterIntakes = recentWaterIntakes)
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
         }
