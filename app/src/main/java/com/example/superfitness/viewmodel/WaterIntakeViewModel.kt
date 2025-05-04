@@ -1,14 +1,10 @@
 package com.example.superfitness.ui.viewmodel
 
-import kotlin.text.Typography.dagger
-
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.superfitness.data.local.db.entity.WaterIntake
 import com.example.superfitness.repository.WaterIntakeRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,7 +13,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 
 class WaterIntakeViewModel (
@@ -46,12 +41,17 @@ class WaterIntakeViewModel (
         }
     }
 
-    fun updateIntake(waterIntake: WaterIntake) {
+    fun updateIntake(id: Int, newAmount: Int, newType: String, originalTime: String) {
         viewModelScope.launch {
-            repository.updateIntake(waterIntake)
+            val updatedIntake = WaterIntake(
+                id = id,
+                amount = newAmount,
+                type = newType,
+                time = originalTime // Giữ nguyên thời gian gốc
+            )
+            repository.updateIntake(updatedIntake)
         }
     }
-
     fun deleteIntake(waterIntake: WaterIntake) {
         viewModelScope.launch {
             repository.deleteIntake(waterIntake)

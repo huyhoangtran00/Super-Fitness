@@ -8,7 +8,7 @@ import java.util.Locale
 
 @Entity(tableName = "water_intakes")  // Đổi tên table số nhiều
 data class WaterIntake(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,  // Sử dụng Long
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,  // Sử dụng Long
     val amount: Int,                // Lượng nước (ml)
     val type: String,               // Loại nước ("Nước lọc", "Trà", etc.)
     val time: String,               // Thời gian (HH:mm)
