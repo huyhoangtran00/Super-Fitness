@@ -192,6 +192,7 @@ fun AppContent(
 
     when(navBackStackEntry?.destination?.route) {
         RunDestination.route,
+        "profile_input",
         RunDetailsDestination.routeWithArgs -> {
             bottomBarState.value = false
         }
