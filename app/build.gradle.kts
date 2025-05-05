@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.superfitness"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -45,11 +45,14 @@ android {
 
 
 }
-
+val hiltVersion by extra("2.54")
+val hiltCompilerVersion by extra("1.2.0")
+val activityVersion by extra("1.9.3")
+val composeNavigationVersion by extra("2.8.5")
+val composeHiltNavigationVersion by extra("1.2.0")
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
-
     implementation("com.google.accompanist:accompanist-permissions:0.37.2")
 
     // Google Maps SDK for Android
@@ -64,11 +67,11 @@ dependencies {
 
     // Room dependencies
 
-    implementation ("androidx.room:room-runtime:2.6.1")
+    implementation ("androidx.room:room-runtime:2.7.0")
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
-    kapt( "androidx.room:room-compiler:2.6.1")
-    implementation( "androidx.room:room-ktx:2.6.1")
+    kapt( "androidx.room:room-compiler:2.7.0")
+    implementation( "androidx.room:room-ktx:2.7.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -94,4 +97,19 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.charts)
+    implementation(libs.okhttp)
+
+
+    implementation("androidx.activity:activity-compose:$activityVersion")
+    implementation("androidx.navigation:navigation-compose:$composeNavigationVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:$composeHiltNavigationVersion")
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    // Retrofit
+    implementation( "com.squareup.retrofit2:retrofit:2.9.0")
+    implementation( "com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation( "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3")
 }

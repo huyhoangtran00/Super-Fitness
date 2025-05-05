@@ -234,18 +234,16 @@ fun UserProfileInputScreen(
                             onClick = {
                                 userProfileViewModel.insertUser(
                                     UserProfile(
-                                    name = name,
-                                    age = selectedAge ?: 0,
-                                    gender = selectedGender ?: "",
-                                    height = selectedHeight!!.toFloat(),
-                                    weight = selectedWeight!!.toFloat(),
-                                    goal = selectedGoal ?: "",
+                                        name = name,
+                                        age = selectedAge ?: 0,
+                                        gender = selectedGender ?: "",
+                                        height = selectedHeight!!.toFloat(),
+                                        weight = selectedWeight!!.toFloat(),
+                                        goal = selectedGoal ?: "",
                                         bmi = bmi,
                                     )
                                 )
-                                step++
-                                onProfileSaved()
-
+                                onProfileSaved() // Gọi callback khi lưu thành công
                             },
                             modifier = Modifier.fillMaxWidth(0.8f)
                         ) {

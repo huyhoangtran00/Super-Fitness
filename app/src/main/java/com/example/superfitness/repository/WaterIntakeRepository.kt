@@ -5,6 +5,7 @@ import androidx.lifecycle.asLiveData
 import com.example.superfitness.data.local.db.dao.WaterIntakeDao
 import com.example.superfitness.data.local.db.entity.WaterIntake
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,8 +27,8 @@ class WaterIntakeRepository(private val waterIntakeDao: WaterIntakeDao) {
     // Lấy tổng lượng nước theo ngày (Flow)
     fun getDailyTotalFlow(date: String = getCurrentDate()): Flow<Int> {
         return waterIntakeDao.getDailyTotal(date)
+            .map { it ?: 0 } // Nếu null, thay bằng 0
     }
-
     // Thêm bản ghi mới (tiện ích mở rộng)
     suspend fun addIntake(amount: Int, type: String, customDate: String? = null) {
         waterIntakeDao.insert(
@@ -65,7 +66,7 @@ class WaterIntakeRepository(private val waterIntakeDao: WaterIntakeDao) {
         waterIntakeDao.clearDailyIntakes(date)
     }
 
-    private fun getCurrentDate(): String {
+    fun getCurrentDate(): String {
         return dateFormat.format(Date())
     }
 }

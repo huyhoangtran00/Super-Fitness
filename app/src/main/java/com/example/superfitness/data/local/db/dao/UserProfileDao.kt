@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.superfitness.data.local.db.entity.UserProfile
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserProfileDao {
@@ -26,4 +27,7 @@ interface UserProfileDao {
 
     @Query("SELECT * FROM user_profile")
     fun getAllUsers(): LiveData<List<UserProfile>>
+
+    @Query("SELECT COUNT(*) FROM user_profile")
+    fun getUserCount(): Flow<Int>
 }
