@@ -204,7 +204,7 @@ fun MapImage(
         LaunchedEffect(key1 = isMapLoaded) {
             if (isMapLoaded) {
                 cameraPositionState.move(
-                    CameraUpdateFactory.newLatLngBounds(bounds, 16)
+                    CameraUpdateFactory.newLatLngBounds(bounds, 32)
                 )
             }
         }

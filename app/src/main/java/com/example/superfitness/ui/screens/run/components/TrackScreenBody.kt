@@ -47,7 +47,7 @@ fun TrackScreenBody(
     distanceInMeters: Int,
     speedInKmH: Float,
     bearing: Float,
-    steps: Int,
+    steps: Long,
     onDismissDialog: () -> Unit,
     onStopAndSaveClick: () -> Unit,
     onStopAndNotSaveClick: () -> Unit

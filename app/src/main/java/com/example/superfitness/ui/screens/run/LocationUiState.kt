@@ -9,7 +9,7 @@ data class LocationUiState(
     val durationTimerInMillis: Long = 0L,
     val speedInKmH: Float = 0f,
     val bearing: Float = 0f,
-    val steps: Int = 0,
+    val steps: Long = 0L,
     val isTracking: Boolean = false,
     var isFirstRun: Boolean = true,
 )

@@ -51,8 +51,7 @@ class TrackingService : Service() {
     private var timeRunInSeconds = MutableStateFlow<Long>(0L)
     private var lastSecondTimestamp = 0L
 
-    private var initialSteps = -1
-    private var totalSteps = 0
+    private var initialSteps = -1L
 
     companion object {
         private const val TAG = "TrackingService"
@@ -91,7 +90,7 @@ class TrackingService : Service() {
             field = value
         }
 
-    private var bearing = 0F
+    private var bearing = 0f
         set(value) {
             _locationUiState.update {
                 it.copy(
@@ -101,7 +100,7 @@ class TrackingService : Service() {
             field = value
         }
 
-    private var steps = 0
+    private var steps = 0L
         set(value) {
             _locationUiState.update {
                 it.copy(
@@ -155,8 +154,7 @@ class TrackingService : Service() {
     private fun pauseTracking() {
         isTracking = false
         isTimerEnabled = false
-
-        unregisterStepCounter()
+        initialSteps = -1L
 
         locationUiState.update {
             it.copy(
@@ -193,15 +191,13 @@ class TrackingService : Service() {
             if (event == null) return
 
             event.let {
-                val stepsSinceReboot = event.values[0].toInt()
+                val stepsSinceReboot = event.values[0].toLong()
 
-                if (initialSteps == -1) {
+                if (initialSteps == -1L) {
                     initialSteps = stepsSinceReboot
                 }
 
-                totalSteps = stepsSinceReboot - initialSteps
-                // Update steps
-                steps = totalSteps
+                steps += stepsSinceReboot - initialSteps
             }
         }
 
@@ -209,7 +205,7 @@ class TrackingService : Service() {
     }
 
     private fun registerStepCounter() {
-
+        if (isTracking) {
             val stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
             if (stepCounterSensor == null) return
@@ -219,7 +215,7 @@ class TrackingService : Service() {
                 stepCounterSensor,
                 SensorManager.SENSOR_DELAY_UI
             )
-
+        }
     }
 
     @SuppressLint("MissingPermission")
