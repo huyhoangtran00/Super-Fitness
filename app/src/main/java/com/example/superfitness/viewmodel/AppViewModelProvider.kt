@@ -2,6 +2,7 @@ package com.example.superfitness.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -15,11 +16,21 @@ import com.example.superfitness.viewmodel.RunViewModel
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            ShareViewModel()
+            RunViewModel(
+                superFitnessApplication().container.locationManager,
+                superFitnessApplication().container.runRepository
+            )
+        }
+
+        initializer {
+            HomeViewModel(
+                superFitnessApplication().container.runRepository
+            )
         }
         initializer {
-            RunViewModel(
-                superFitnessApplication().container.locationManager
+            RunDetailsViewModel(
+                this.createSavedStateHandle(),
+                superFitnessApplication().container.runRepository
             )
         }
     }

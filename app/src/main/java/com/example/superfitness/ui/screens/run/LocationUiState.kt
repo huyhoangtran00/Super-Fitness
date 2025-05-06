@@ -1,4 +1,4 @@
-package com.example.superfitness.ui.tracking
+package com.example.superfitness.ui.screens.run
 
 import com.google.android.gms.maps.model.LatLng
 
@@ -8,5 +8,8 @@ data class LocationUiState(
     val distanceInMeters: Int = 0,
     val durationTimerInMillis: Long = 0L,
     val speedInKmH: Float = 0f,
-    val isTracking: Boolean = false
+    val bearing: Float = 0f,
+    val steps: Long = 0L,
+    val isTracking: Boolean = false,
+    var isFirstRun: Boolean = true,
 )

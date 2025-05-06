@@ -1,13 +1,18 @@
-package com.example.superfitness.ui.tracking
+package com.example.superfitness.ui.screens.run
 
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.superfitness.R
 import com.example.superfitness.utils.CHANNEL_ID
@@ -27,6 +32,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.math.RoundingMode
 
 class TrackingService : Service() {
@@ -35,21 +41,36 @@ class TrackingService : Service() {
         LocationServices.getFusedLocationProviderClient(this)
     }
 
+    private val sensorManager: SensorManager by lazy {
+        getSystemService(SENSOR_SERVICE) as SensorManager
+    }
+
     private var isTimerEnabled = false
     private var startedTime = 0L
     private var lapTime = 0L
     private var timeRunInSeconds = MutableStateFlow<Long>(0L)
     private var lastSecondTimestamp = 0L
 
+    private var initialSteps = -1L
+
     companion object {
         private const val TAG = "TrackingService"
+        var startTime = 0L
 
         private val _locationUiState = MutableStateFlow(LocationUiState())
         val locationUiState = _locationUiState
     }
+    private var serviceKilled = false
 
     private var isFirstRun = true
-    private var serviceKilled = false
+        set(value) {
+            _locationUiState.update {
+                it.copy(
+                    isFirstRun = value
+                )
+            }
+            field = value
+        }
     private var isTracking = false
         set(value) {
             _locationUiState.update {
@@ -64,6 +85,26 @@ class TrackingService : Service() {
             _locationUiState.update {
                 it.copy(
                     durationTimerInMillis = value
+                )
+            }
+            field = value
+        }
+
+    private var bearing = 0f
+        set(value) {
+            _locationUiState.update {
+                it.copy(
+                    bearing = bearing
+                )
+            }
+            field = value
+        }
+
+    private var steps = 0L
+        set(value) {
+            _locationUiState.update {
+                it.copy(
+                    steps = steps
                 )
             }
             field = value
@@ -87,31 +128,39 @@ class TrackingService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    override fun onDestroy() {
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+        super.onDestroy()
+    }
+
     private fun startOrResumeTracking() {
         if (isFirstRun) {
             isFirstRun = false
             isTracking = true
+            startTime = System.currentTimeMillis()
 
+            startForegroundService()
+            registerStepCounter()
             requestLocationUpdates()
             startTime()
-            startForegroundService()
         } else {
             isTracking = true
             startTime()
+            registerStepCounter()
         }
     }
-
-//    private fun startTracking() {
-//        isTracking = true
-//
-//        requestLocationUpdates()
-//        startTimer()
-//        startForegroundService()
-//    }
 
     private fun pauseTracking() {
         isTracking = false
         isTimerEnabled = false
+        initialSteps = -1L
+
+        locationUiState.update {
+            it.copy(
+                speedInKmH = 0f
+            )
+        }
     }
 
     private fun startTime() {
@@ -126,7 +175,7 @@ class TrackingService : Service() {
                 timeRunInMillis += lapTime
                 // Reset each loop
                 startedTime = System.currentTimeMillis()
-                
+
                 if (timeRunInMillis >= lastSecondTimestamp + 1000L) {
                     timeRunInSeconds.value += 1
                     lastSecondTimestamp += 1000L
@@ -137,29 +186,37 @@ class TrackingService : Service() {
         }
     }
 
-//    private fun startTimer() {
-//        timer?.cancel()
-//        timer = Timer()
-//
-//        isTimerEnabled = true
-//        startedTime = System.currentTimeMillis()
-//
-//        timer?.schedule(object : TimerTask() {
-//            override fun run() {
-//                _locationUiState.update {
-//                    it.copy(
-//                        durationTimer = getDurationTimer()
-//                    )
-//                }
-//            }
-//        }, 1, 1)
-//    }
+    private val sensorListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            if (event == null) return
 
-//    private fun getDurationTimer(): String {
-//        return TimeUtilFormatter.getTime(
-//            System.currentTimeMillis() - startedTime
-//        )
-//    }
+            event.let {
+                val stepsSinceReboot = event.values[0].toLong()
+
+                if (initialSteps == -1L) {
+                    initialSteps = stepsSinceReboot
+                }
+
+                steps += stepsSinceReboot - initialSteps
+            }
+        }
+
+        override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
+    }
+
+    private fun registerStepCounter() {
+        if (isTracking) {
+            val stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+            if (stepCounterSensor == null) return
+
+            sensorManager.registerListener(
+                sensorListener,
+                stepCounterSensor,
+                SensorManager.SENSOR_DELAY_UI
+            )
+        }
+    }
 
     @SuppressLint("MissingPermission")
     private fun requestLocationUpdates() {
@@ -181,6 +238,9 @@ class TrackingService : Service() {
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             super.onLocationResult(result)
+
+            val location = result.lastLocation ?: return
+            bearing = location.bearing
 
             if (isTracking) {
                 result.locations.forEach { location ->
@@ -221,6 +281,11 @@ class TrackingService : Service() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
+    private fun unregisterStepCounter() {
+        sensorManager.unregisterListener(sensorListener)
+        initialSteps = -1
+    }
+
     private fun startForegroundService() {
         startForeground(123, createNotification(this, "Tracking current location.."))
     }
@@ -237,12 +302,12 @@ class TrackingService : Service() {
     }
 
     private fun stopTracking() {
-
         isTracking = false
         serviceKilled = true
         isFirstRun = false
         _locationUiState.update { LocationUiState() }
         removeLocationUpdates()
+        unregisterStepCounter()
 
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()

@@ -1,66 +1,43 @@
-package com.example.superfitness.ui.run
+package com.example.superfitness.ui.screens.run
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.example.superfitness.R
-import com.example.superfitness.ui.components.LocationPermissionTextProvider
-import com.example.superfitness.ui.components.PermissionDialog
+import com.example.superfitness.data.local.db.entity.RunEntity
 import com.example.superfitness.ui.navigation.NavigationDestination
-import com.example.superfitness.ui.tracking.TrackingDestination
+import com.example.superfitness.ui.screens.run.components.StartScreenBody
+import com.example.superfitness.ui.screens.run.components.StartScreenBottomBar
+import com.example.superfitness.ui.screens.run.components.StartScreenTopBar
+import com.example.superfitness.ui.screens.run.components.TrackScreenBody
+import com.example.superfitness.ui.screens.run.components.TrackScreenBottomBar
+import com.example.superfitness.ui.screens.run.components.TrackScreenTopBar
+import com.example.superfitness.utils.LocationsUtils
 import com.example.superfitness.viewmodel.AppViewModelProvider
 import com.example.superfitness.viewmodel.RunViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.delay
 
 object RunDestination : NavigationDestination {
@@ -68,46 +45,104 @@ object RunDestination : NavigationDestination {
     override val titleRes = R.string.run
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun RunScreen(
     viewModel: RunViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    locationPermissions: MultiplePermissionsState,
-    navController: NavController,
+    onCloseScreenClick: () -> Unit,
     openSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val locationPermissions = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACTIVITY_RECOGNITION
+        )
+    )
 
     val isGpsAvailable = viewModel.isGpsAvailable.collectAsStateWithLifecycle().value
+    val locationUiState = viewModel.locationUiState.collectAsStateWithLifecycle().value
+    val isFirstRun = locationUiState.isFirstRun
 
+    val showTrackingScreen = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(400L) // Delay to ensure transition completes
+        showTrackingScreen.value = true
+    }
+
+    AnimatedVisibility(isFirstRun) {
+        StartScreen(
+            modifier = Modifier.fillMaxSize(),
+            locationPermissions = locationPermissions,
+            isGpsAvailable = isGpsAvailable,
+            openSettings = openSettings,
+            onStartClick = {
+                performTrackingService(context, Actions.START_OR_RESUME)
+            },
+            onCloseScreenClick = onCloseScreenClick
+        )
+    }
+    AnimatedVisibility(!isFirstRun) {
+        TrackingScreen(
+            modifier = Modifier.fillMaxSize(),
+            locationUiState = locationUiState,
+            onCloseScreenClick = onCloseScreenClick,
+            saveRun = {
+                viewModel.addRun(
+                    RunEntity(
+                        timeStamp = TrackingService.startTime,
+                        distance = locationUiState.distanceInMeters,
+                        duration = locationUiState.durationTimerInMillis,
+                        pathPoints = LocationsUtils.pathPointsToString(locationUiState.pathPoints)
+                    )
+                )
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun StartScreen(
+    modifier: Modifier = Modifier,
+    locationPermissions: MultiplePermissionsState,
+    isGpsAvailable: Boolean,
+    onCloseScreenClick: () -> Unit,
+    openSettings: () -> Unit,
+    onStartClick: () -> Unit
+) {
     var showDialog by remember {
         mutableStateOf(false)
     }
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
     Scaffold(
         topBar = {
-            RunScreenTopBar(
-                scrollBehavior = scrollBehavior
+            StartScreenTopBar(
+                modifier = Modifier.fillMaxWidth(),
+                onCloseScreenClick = onCloseScreenClick
             )
         },
         bottomBar = {
-            RunScreenBottomBar(
+            StartScreenBottomBar(
                 onClick = {
-                    if (locationPermissions.allPermissionsGranted) { // Show the start running screen
-                        navController.navigate(TrackingDestination.route)
+                    if (locationPermissions.allPermissionsGranted) {
+                        // Show the start running screen
+                        // And start the service
+                        onStartClick()
                     } else {
                         showDialog = true
                     }
                 },
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
                     .fillMaxWidth()
             )
         }
     ) { paddingValues ->
-        RunScreenBody(
+        StartScreenBody(
             arePermissionsGranted = locationPermissions.allPermissionsGranted,
             isGpsAvailable = isGpsAvailable,
             showDialog = showDialog,
@@ -120,182 +155,93 @@ fun RunScreen(
                 .fillMaxSize()
         )
     }
-
-    // Track if the permission is granted or not after the user interaction
-
-
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RunScreenTopBar(
+fun TrackingScreen(
     modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior
+    locationUiState: LocationUiState,
+    onCloseScreenClick: () -> Unit,
+    saveRun: () -> Unit
 ) {
-    TopAppBar(
-        title = {
-            Text(
+    val context = LocalContext.current
+
+    var showSaverDialog by rememberSaveable { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TrackScreenTopBar(
+                isRunning = locationUiState.isTracking,
+                onCloseScreenClick = onCloseScreenClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        bottomBar = {
+            TrackScreenBottomBar(
                 modifier = Modifier.fillMaxWidth(),
-                text = "Run Screen",
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 24.sp,
-                color = Color.Black
-            )
-        },
-        navigationIcon = {
-            TextButton(
-                onClick = {}
-            ) {
-                Text(
-                    text = "Close",
-                    fontSize = 16.sp,
-                    color = Color.Black
-                )
-            }
-        },
-        actions = {
-            IconButton(
-                onClick = {},
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Circle icon profile",
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-        },
-        scrollBehavior = scrollBehavior,
-        modifier = modifier.fillMaxWidth(),
-    )
-}
-
-@Composable
-fun RunScreenBody(
-    modifier: Modifier = Modifier,
-    arePermissionsGranted: Boolean,
-    isGpsAvailable: Boolean,
-    showDialog: Boolean,
-    isPermanentlyDeclined: Boolean,
-    cancelDialog: () -> Unit,
-    launchRationale: () -> Unit,
-    goToSystemSetting: () -> Unit
-) {
-
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(36.73723, 3.08647), 3f)
-    }
-
-    var showMessage by remember { mutableStateOf(false) }
-
-    LaunchedEffect(isGpsAvailable) {
-        if (isGpsAvailable) {
-            showMessage = true
-            delay(3000)
-            showMessage = false
-        } else {
-            showMessage = false
-        }
-    }
-
-
-    if (arePermissionsGranted) {
-        Box(
-            modifier = modifier
-        ) {
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState
-            )
-            AnimatedVisibility(
-                visible = !isGpsAvailable,
-                enter = slideInVertically(
-                    initialOffsetY = { fullHeight -> -fullHeight },
-                    animationSpec = tween(durationMillis = 150, easing = LinearOutSlowInEasing)
-                ),
-                exit = slideOutVertically(
-                    targetOffsetY = { fullHeight -> -fullHeight },
-                    animationSpec = tween(durationMillis = 250, easing = FastOutLinearInEasing)
-                )
-            ) {
-                EditMessage("GPS is unavailable")
-            }
-            AnimatedVisibility(
-                visible = showMessage,
-                enter = slideInVertically(
-                    initialOffsetY = { fullHeight -> -fullHeight },
-                    animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing)
-                ),
-                exit = slideOutVertically(
-                    targetOffsetY = { fullHeight -> -fullHeight },
-                    animationSpec = tween(durationMillis = 250, easing = FastOutLinearInEasing)
-                )
-            ) {
-                EditMessage("GPS is available")
-            }
-        }
-    } else {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text("Running function needs precise location permission")
-            if (showDialog) {
-                PermissionDialog(
-                    permissionTextProvider = LocationPermissionTextProvider(),
-                    isPermanentlyDeclined = isPermanentlyDeclined,
-                    onDismiss = { cancelDialog() },
-                    onOkClick = {
-                        cancelDialog()
-                        launchRationale()
-                    },
-                    onGoToSystemSettingsClick = { goToSystemSetting() }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun RunScreenBottomBar(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    BottomAppBar(
-        content = {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                TextButton(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .size(80.dp),
-                    onClick = onClick,
-                    colors = ButtonDefaults.buttonColors()
-                ) {
-                    Text(text = "START", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                isRunning = locationUiState.isTracking,
+                onPauseAndResumeClick = {
+                    if(locationUiState.isTracking) {
+                        performTrackingService(context, Actions.PAUSE)
+                    } else {
+                        performTrackingService(context, Actions.START_OR_RESUME)
+                    }
+                },
+                onFinishClick = {
+                    showSaverDialog = true
                 }
-            }
+            )
         },
         modifier = modifier
-    )
+    ) { paddingValues ->
+        TrackScreenBody(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
+            isRunning = locationUiState.isTracking,
+            showSaverDialog = showSaverDialog,
+            currentLocation = locationUiState.currentLocation,
+            pathPoints = locationUiState.pathPoints,
+            durationTimerInMillis = locationUiState.durationTimerInMillis,
+            distanceInMeters = locationUiState.distanceInMeters,
+            speedInKmH = locationUiState.speedInKmH,
+            bearing = locationUiState.bearing,
+            steps = locationUiState.steps,
+            onDismissDialog = { showSaverDialog = false },
+            onStopAndSaveClick = {
+                saveRun()
+                showSaverDialog = false
+                performTrackingService(context, Actions.STOP)
+                onCloseScreenClick()
+            },
+            onStopAndNotSaveClick = {
+                showSaverDialog = false
+                performTrackingService(context, Actions.STOP)
+                onCloseScreenClick()
+            }
+        )
+
+    }
+}
+private fun performTrackingService(
+    context: Context,
+    actions: Actions
+) {
+    Intent(context, TrackingService::class.java).also {
+        it.action = actions.name
+        context.startService(it)
+    }
 }
 
+@Preview
 @Composable
-private fun EditMessage(msg: String) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = if (msg == "GPS is unavailable") Color.Red else Color.Green,
-        shadowElevation = 18.dp
-    ) {
-        Text(
-            text = msg,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(16.dp)
-        )
-    }
+fun TrackScreenPreview() {
+    TrackingScreen(
+        locationUiState = LocationUiState(),
+        onCloseScreenClick = {},
+        saveRun = {}
+    )
 }
 
 
