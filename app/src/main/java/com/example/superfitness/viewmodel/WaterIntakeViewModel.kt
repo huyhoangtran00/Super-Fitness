@@ -76,4 +76,7 @@ class WaterIntakeViewModel (
         )
     }
 
+    // Hàm mới: Lấy toàn bộ dữ liệu uống nước
+    fun getAllIntakesFlow(): Flow<List<WaterIntake>> = repository.getAllIntakesFlow()
+
 }

@@ -76,24 +76,23 @@ fun BarScreen(
         RunData(date = day, value = totalDistance)
     }
 
-    val waterIntakes by waterIntakeViewModel.intakesByDate
+    // Lấy toàn bộ dữ liệu uống nước
+    val allWaterIntakes by waterIntakeViewModel.getAllIntakesFlow()
         .collectAsStateWithLifecycle(initialValue = emptyList())
 
     val waterData = recentDays.map { date ->
-        val intakes = waterIntakes.filter { it.date == date }
+        val intakes = allWaterIntakes.filter { it.date == date }
         WaterData(
             date = date,
-            value = if (intakes.isNotEmpty()) intakes.sumOf { it.amount }.toFloat() else 0f
+            value = if (intakes.isNotEmpty()) intakes.sumOf { it.amount }.toFloat() / 1000f else 0f
         )
     }
 
-    val recentWaterIntakes = recentDays.map { date ->
-        waterIntakes.filter { it.date == date }
-    }.flatten().sortedByDescending { it.date }.take(7)
+    val recentWaterIntakes = allWaterIntakes.sortedByDescending { it.date + " " + it.time }.take(10)
 
     var isRunDataSelected by remember { mutableStateOf(true) }
 
-    if (runs.isEmpty() && waterIntakes.isEmpty()) {
+    if (runs.isEmpty() && allWaterIntakes.isEmpty()) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
