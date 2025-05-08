@@ -10,18 +10,19 @@ interface RunRepository {
     suspend fun addRun(runEntity: RunEntity)
     suspend fun removeRun(runEntity: RunEntity)
 }
+
 class OfflineRunRepository(
     private val runDao: RunDao
-) : RunRepository{
+) : RunRepository {
     override fun getRunStream(id: Int): Flow<RunEntity?> =
         runDao.getRun(id)
 
     override fun getRunsStream(): Flow<List<RunEntity>> =
         runDao.getAllRuns()
+    
     override suspend fun addRun(runEntity: RunEntity) =
         runDao.insertRun(runEntity)
 
     override suspend fun removeRun(runEntity: RunEntity) =
         runDao.deleteRun(runEntity)
-
 }

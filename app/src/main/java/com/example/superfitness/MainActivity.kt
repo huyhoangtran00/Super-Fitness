@@ -17,11 +17,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -44,12 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.superfitness.data.local.dao.AirQualityDao
 import com.example.superfitness.data.local.dao.WeatherDao
 import com.example.superfitness.data.local.db.AppDatabase
@@ -61,34 +56,38 @@ import com.example.superfitness.data.repository.AirQualityRepository
 import com.example.superfitness.data.repository.UserProfileRepository
 import com.example.superfitness.data.repository.WeatherRepository
 import com.example.superfitness.repository.DefaultILocationTracker
+import com.example.superfitness.repository.OfflineRunRepository
 import com.example.superfitness.repository.WaterIntakeRepository
 import com.example.superfitness.ui.WeatherCard
+import com.example.superfitness.ui.screens.BarScreenDestination
+import com.example.superfitness.ui.screens.BarScreen
 import com.example.superfitness.ui.screens.run.RunDestination
 import com.example.superfitness.ui.screens.run.RunScreen
 import com.example.superfitness.ui.screens.WaterTrackingApp
-import com.example.superfitness.ui.viewmodel.UserProfileViewModel
+import com.example.superfitness.viewmodel.UserProfileViewModel
 import com.example.superfitness.viewmodel.UserProfileViewModelFactory
 import com.example.superfitness.ui.screens.UserProfileInputScreen
 import com.example.superfitness.ui.screens.home.HomeDestination
 import com.example.superfitness.ui.screens.home.HomeScreen
 import com.example.superfitness.ui.screens.runningdetails.RunDetailsDestination
-import com.example.superfitness.ui.screens.runningdetails.RunDetailsDestination.runItemIdArg
 import com.example.superfitness.ui.screens.runningdetails.RunDetailsScreen
-import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
+import com.example.superfitness.viewmodel.WaterIntakeViewModel
 import com.example.superfitness.viewmodel.WaterIntakeViewModelFactory
 import com.example.superfitness.viewmodel.WeatherViewModel
 import com.example.superfitness.viewmodel.WeatherViewModelFactory
+import com.example.superfitness.viewmodel.RunViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import kotlin.collections.listOf
+import com.example.superfitness.location.AndroidLocationManager
 
 class MainActivity : ComponentActivity() {
     private lateinit var userProfileViewModel: UserProfileViewModel
     private lateinit var waterIntakeViewModel: WaterIntakeViewModel
-    private lateinit var  weatherViewModel : WeatherViewModel
+    private lateinit var weatherViewModel : WeatherViewModel
+    private lateinit var runViewModel: RunViewModel
 
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
@@ -109,6 +108,12 @@ class MainActivity : ComponentActivity() {
         val waterIntakeRepository = WaterIntakeRepository(waterIntakeDao)
         val waterFactory = WaterIntakeViewModelFactory(waterIntakeRepository)
         waterIntakeViewModel = ViewModelProvider(this, waterFactory).get(WaterIntakeViewModel::class.java)
+
+        // Initialize RunRepository and RunViewModel
+        val runDao = db.runDao() 
+        val runRepository = OfflineRunRepository(runDao)
+        val locationManager = AndroidLocationManager(applicationContext, LocationServices.getFusedLocationProviderClient(this))
+        runViewModel = RunViewModel(locationManager, runRepository)
 
         val connectionManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val weatherApi = Retrofit.Builder()
@@ -150,6 +155,7 @@ class MainActivity : ComponentActivity() {
                     userProfileViewModel = userProfileViewModel,
                     waterIntakeViewModel = waterIntakeViewModel,
                     weatherViewModel = weatherViewModel,
+                    runViewModel = runViewModel,
                     openSettings = ::openAppSettings
                 )
             }
@@ -164,6 +170,7 @@ fun AppContent(
     userProfileViewModel: UserProfileViewModel,
     waterIntakeViewModel: WaterIntakeViewModel,
     weatherViewModel: WeatherViewModel,
+    runViewModel: RunViewModel,
     openSettings: () -> Unit
 ) {
 
@@ -233,6 +240,9 @@ fun AppContent(
                         navController.navigate(
                             "${RunDetailsDestination.route}/${it}"
                         )
+                    },
+                    onStatsClick = {
+                        navController.navigate(BarScreenDestination.route)
                     }
                 )
             }
@@ -271,6 +281,14 @@ fun AppContent(
                     onBackClick = {
                         navController.navigateUp()
                     }
+                )
+            }
+            composable(
+                route = BarScreenDestination.route
+            ) {
+                BarScreen(
+                    runViewModel = runViewModel,
+                    waterIntakeViewModel = waterIntakeViewModel
                 )
             }
             composable("weather") {

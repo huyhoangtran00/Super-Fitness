@@ -18,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.superfitness.R
 import com.example.superfitness.ui.navigation.NavigationDestination
+import com.example.superfitness.ui.screens.BarScreenDestination
 import com.example.superfitness.ui.screens.home.components.RunningCard
 import com.example.superfitness.viewmodel.AppViewModelProvider
 import com.example.superfitness.viewmodel.HomeViewModel
@@ -31,7 +32,8 @@ object HomeDestination : NavigationDestination {
 fun HomeScreen(
     modifier: Modifier,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onRunItemClick: (Int) -> Unit
+    onRunItemClick: (Int) -> Unit,
+    onStatsClick: () -> Unit = {}
 ) {
     val runsList = viewModel.allRuns.collectAsStateWithLifecycle().value
 
@@ -61,7 +63,8 @@ fun HomeScreen(
                 runItem = item,
                 onClick = {
                     onRunItemClick(item.id)
-                }
+                },
+                onStatsClick = onStatsClick
             )
         }
     }

@@ -86,7 +86,7 @@ dependencies {
     implementation ("com.airbnb.android:lottie-compose:6.1.0")
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
-
+    implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.appcompat)

@@ -13,8 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,7 +54,8 @@ import com.google.maps.android.compose.rememberCameraPositionState
 fun RunningCard(
     modifier: Modifier = Modifier,
     runItem: RunEntity,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onStatsClick: () -> Unit = {}
 ) {
     val dateAndTime = TimeUtilFormatter.getDate(runItem.timeStamp)
     val timeOfDay = TimeUtilFormatter.getTimeOfTheDay(runItem.timeStamp)
@@ -72,13 +77,25 @@ fun RunningCard(
         Column(modifier = Modifier.padding(top = 16.dp, bottom = 32.dp)) {
             Row(modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)) {
+                .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = dateAndTime,
                     style = MaterialTheme.typography.labelMedium.copy(
                         color = Color.Gray,
-                    )
+                    ),
+                    modifier = Modifier.weight(1f)
                 )
+                
+                IconButton(
+                    onClick = onStatsClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.BarChart,
+                        contentDescription = "View Statistics",
+                        tint = Color.Green
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(24.dp))
             Row(modifier = Modifier
