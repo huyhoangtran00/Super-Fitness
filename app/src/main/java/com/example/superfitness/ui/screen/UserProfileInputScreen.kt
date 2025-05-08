@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.superfitness.data.local.db.entity.UserProfile
-import com.example.superfitness.viewmodel.UserProfileViewModel
+import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -73,7 +73,7 @@ fun UserProfileInputScreen(
                         ) {
                             ageOptions.forEach { ageOption ->
                                 DropdownMenuItem(
-                                text = {Text(ageOption.toString())},
+                                    text = {Text(ageOption.toString())},
                                     onClick = {
                                         selectedAge = ageOption
                                         expanded = false
@@ -163,8 +163,8 @@ fun UserProfileInputScreen(
                             weightOptions.forEach { weightOption ->
                                 DropdownMenuItem(
                                     text = {Text(weightOption.toString())}
-,
-                                            onClick = {
+                                    ,
+                                    onClick = {
                                         selectedWeight = weightOption
                                         expanded = false
                                     }
@@ -194,7 +194,7 @@ fun UserProfileInputScreen(
                                 DropdownMenuItem(
                                     text = {Text(goalOption.toString())}
 
-                                        ,
+                                    ,
                                     onClick = {
                                         selectedGoal = goalOption
                                         expanded = false

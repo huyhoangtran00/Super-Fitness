@@ -64,14 +64,14 @@ import com.example.superfitness.ui.screens.BarScreen
 import com.example.superfitness.ui.screens.run.RunDestination
 import com.example.superfitness.ui.screens.run.RunScreen
 import com.example.superfitness.ui.screens.WaterTrackingApp
-import com.example.superfitness.viewmodel.UserProfileViewModel
+import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import com.example.superfitness.viewmodel.UserProfileViewModelFactory
 import com.example.superfitness.ui.screens.UserProfileInputScreen
 import com.example.superfitness.ui.screens.home.HomeDestination
 import com.example.superfitness.ui.screens.home.HomeScreen
 import com.example.superfitness.ui.screens.runningdetails.RunDetailsDestination
 import com.example.superfitness.ui.screens.runningdetails.RunDetailsScreen
-import com.example.superfitness.viewmodel.WaterIntakeViewModel
+import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
 import com.example.superfitness.viewmodel.WaterIntakeViewModelFactory
 import com.example.superfitness.viewmodel.WeatherViewModel
 import com.example.superfitness.viewmodel.WeatherViewModelFactory

@@ -27,7 +27,7 @@ import com.example.superfitness.ui.charts.RunHistory
 import com.example.superfitness.ui.charts.WaterData
 import com.example.superfitness.ui.charts.WaterHistory
 import com.example.superfitness.ui.navigation.NavigationDestination
-import com.example.superfitness.viewmodel.WaterIntakeViewModel
+import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
 import com.example.superfitness.viewmodel.RunViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar

@@ -1,4 +1,4 @@
-package com.example.superfitness.viewmodel
+package com.example.superfitness.ui.viewmodel
 
 
 import androidx.lifecycle.ViewModel

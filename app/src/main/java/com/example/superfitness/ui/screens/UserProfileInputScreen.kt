@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.local.db.entity.UserProfile
 import com.example.superfitness.data.repository.UserProfileRepository
-import com.example.superfitness.viewmodel.UserProfileViewModel
+import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import kotlinx.coroutines.delay
 
 

@@ -41,7 +41,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.superfitness.data.local.db.entity.WaterIntake
-import com.example.superfitness.viewmodel.WaterIntakeViewModel
+import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
