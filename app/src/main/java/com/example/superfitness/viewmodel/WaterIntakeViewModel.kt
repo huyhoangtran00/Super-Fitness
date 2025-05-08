@@ -1,6 +1,9 @@
 package com.example.superfitness.ui.viewmodel
 
 
+import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.superfitness.data.local.db.entity.WaterIntake
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 class WaterIntakeViewModel (

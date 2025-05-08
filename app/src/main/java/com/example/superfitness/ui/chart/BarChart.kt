@@ -62,9 +62,9 @@ fun BarChart(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .shadow(
-                elevation = 8.dp, // Độ cao của bóng
-                shape = RoundedCornerShape(16.dp), // Bo góc của bóng
-                clip = true // Đảm bảo bóng không bị cắt
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp),
+                clip = true
             )
             .background(
                 color = Color.White,
@@ -166,7 +166,7 @@ fun setupBarChart(barChart: BarChart, dataList: List<ChartData>, isRunData: Bool
         valueFormatter = IndexAxisValueFormatter(xAxisLabels)
         setDrawGridLines(false)
         setDrawAxisLine(false)
-        textColor = android.graphics.Color.WHITE
+        textColor = android.graphics.Color.BLACK
         position = XAxis.XAxisPosition.BOTTOM
         granularity = 1f
         setLabelCount(xAxisLabels.size, false)

@@ -1,5 +1,6 @@
 package com.example.superfitness.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,8 +34,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 object BarScreenDestination : NavigationDestination {
     override val route = "bar_screen"
@@ -50,11 +49,11 @@ fun BarScreen(
     val calendar = Calendar.getInstance()
     val sevenDaysAgo = calendar.apply { add(Calendar.DAY_OF_YEAR, -7) }.timeInMillis
 
-    val recentDays = (0 downTo -6).map { offset ->
-        calendar.apply { add(Calendar.DAY_OF_YEAR, offset) }
-        val date = dateFormat.format(calendar.time)
-        calendar.apply { add(Calendar.DAY_OF_YEAR, -offset) }
-        date
+    val today = Calendar.getInstance()
+    val recentDays = (0..6).map { i ->
+        val cal = today.clone() as Calendar
+        cal.add(Calendar.DAY_OF_YEAR, -i)
+        dateFormat.format(cal.time)
     }.reversed()
 
     val runs by runViewModel.getRunsStream()
@@ -76,7 +75,6 @@ fun BarScreen(
         RunData(date = day, value = totalDistance)
     }
 
-    // Lấy toàn bộ dữ liệu uống nước
     val allWaterIntakes by waterIntakeViewModel.getAllIntakesFlow()
         .collectAsStateWithLifecycle(initialValue = emptyList())
 
@@ -84,10 +82,10 @@ fun BarScreen(
         val intakes = allWaterIntakes.filter { it.date == date }
         WaterData(
             date = date,
-            value = if (intakes.isNotEmpty()) intakes.sumOf { it.amount }.toFloat() / 1000f else 0f
+            value = if (intakes.isNotEmpty()) intakes.sumOf { it.amount }.toFloat() else 0f
         )
     }
-
+    Log.d("BarScreen", "Run Data: $runsByDay")
     val recentWaterIntakes = allWaterIntakes.sortedByDescending { it.date + " " + it.time }.take(10)
 
     var isRunDataSelected by remember { mutableStateOf(true) }
