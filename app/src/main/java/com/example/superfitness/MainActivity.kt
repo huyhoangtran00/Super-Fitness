@@ -241,9 +241,8 @@ fun AppContent(
                             "${RunDetailsDestination.route}/${it}"
                         )
                     },
-                    onStatsClick = {
-                        navController.navigate(BarScreenDestination.route)
-                    }
+                    runViewModel = runViewModel,
+                    waterIntakeViewModel = waterIntakeViewModel
                 )
             }
             composable("water") {

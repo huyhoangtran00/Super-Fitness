@@ -85,7 +85,7 @@ fun BarScreen(
             value = if (intakes.isNotEmpty()) intakes.sumOf { it.amount }.toFloat() else 0f
         )
     }
-    Log.d("BarScreen", "Run Data: $runsByDay")
+
     val recentWaterIntakes = allWaterIntakes.sortedByDescending { it.date + " " + it.time }.take(10)
 
     var isRunDataSelected by remember { mutableStateOf(true) }

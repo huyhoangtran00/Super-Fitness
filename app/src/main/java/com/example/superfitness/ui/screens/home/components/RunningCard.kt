@@ -86,16 +86,6 @@ fun RunningCard(
                     ),
                     modifier = Modifier.weight(1f)
                 )
-                
-                IconButton(
-                    onClick = onStatsClick
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.BarChart,
-                        contentDescription = "View Statistics",
-                        tint = Color.Green
-                    )
-                }
             }
             Spacer(modifier = Modifier.height(24.dp))
             Row(modifier = Modifier
