@@ -36,9 +36,14 @@ class UserProfileRepository(private val userProfileDao: UserProfileDao) {
 
     // Lấy người dùng theo ID
     suspend fun getUserById(userId: Int): UserProfile? {
-
         return userProfileDao.getUserById(userId)
     }
+
+    // Trả về BMI dưới dạng Float
+    suspend fun getUserBmi(userId: Int): Float? = userProfileDao.getUserBmi(userId)
+
+    // Trả về weight dưới dạng Float
+    suspend fun getUserWeight(userId: Int): Float? = userProfileDao.getUserWeight(userId)
     fun hasUserProfile(): Flow<Boolean> = userProfileDao.getUserCount().map { it > 0 }
 
 }

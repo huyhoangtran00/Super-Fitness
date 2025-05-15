@@ -70,4 +70,32 @@ class UserProfileViewModel (
             }
         }
     }
+    fun getUserBmiLive(userId: Int): LiveData<Float?> = liveData(Dispatchers.IO) {
+        emit(userProfileRepository.getUserBmi(userId))
+    }
+
+    fun getUserWeightLive(userId: Int): LiveData<Float?> = liveData(Dispatchers.IO) {
+        emit(userProfileRepository.getUserWeight(userId))
+    }
+
+    /**
+     * Trả về lượng nước cần uống dựa theo BMI và cân nặng.
+     */
+    suspend fun getWaterTargetValue(userId: Int): Float{
+    val bmi = userProfileRepository.getUserBmi(userId) ?: 0f
+        val weight = userProfileRepository.getUserWeight(userId) ?: 0f
+        return calculateWaterTarget(weight, bmi)
+    }
+
+    /**
+     * Hàm tính toán lượng nước cần uống (ml)
+     */
+    private fun calculateWaterTarget(weightKg: Float, bmi: Float): Float {
+        val factor = when {
+            bmi < 18.5f -> 40f
+            bmi < 25f   -> 35f
+            else        -> 30f
+        }
+        return weightKg * factor
+    }
 }

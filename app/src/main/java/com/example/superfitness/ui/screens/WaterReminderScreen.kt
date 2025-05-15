@@ -1,6 +1,7 @@
 package com.example.superfitness.ui.screens
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -41,32 +42,41 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.superfitness.data.local.db.entity.WaterIntake
+import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
+import com.example.superfitness.utils.PreferencesManager
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WaterTrackingApp(viewModel: WaterIntakeViewModel) {
+fun WaterTrackingApp(viewModel: WaterIntakeViewModel,     preferencesManager: PreferencesManager , userProfileViewModel: UserProfileViewModel// Thêm vào constructor
+) {
     val waterRecords by viewModel.intakesByDate.collectAsState(initial = emptyList())
     val dailyTotal by viewModel.dailyTotal.collectAsState()
-    val targetAmount = 2000 // 2L = 2000ml
+    val coroutineScope = rememberCoroutineScope()  // ← tạo scope
+    var targetAmount by remember { mutableStateOf(0f) }
+    var isTargetLoaded by remember { mutableStateOf(false) }
+    val isReady = isTargetLoaded && targetAmount > 0f
 
+    LaunchedEffect(Unit) {
+        targetAmount = userProfileViewModel.getWaterTargetValue(1)
+        isTargetLoaded = true
+
+    }
     var showReminderDialog by remember { mutableStateOf(false) }
-    var reminderEnabled by remember { mutableStateOf(false) }
-    var reminderInterval by remember { mutableStateOf(60) } // phút
+    // Đọc settings từ DataStore
+    val reminderSettings by preferencesManager.reminderSettings.collectAsState(initial = Pair(false, 60))
+    var (reminderEnabled, reminderInterval) = reminderSettings
 
     val context = LocalContext.current
-    val notificationLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            showNotification(context, "Đã đến giờ uống nước!", "Bạn đã uống đủ nước chưa?")
-        }
-    }
 
     // Xử lý nhắc nhở định kỳ
     LaunchedEffect(reminderEnabled, reminderInterval) {
+        preferencesManager.saveReminderSettings(reminderEnabled, reminderInterval)
+
         if (reminderEnabled) {
             while (true) {
                 delay(TimeUnit.MINUTES.toMillis(reminderInterval.toLong()))
@@ -103,30 +113,51 @@ fun WaterTrackingApp(viewModel: WaterIntakeViewModel) {
                     .background(Color.White) // ⬅️ Đổi màu nền thành trắng
                     .padding(padding)
             ) {
-                WaterHeader(
-                    currentAmount = dailyTotal / 1000f, // Chuyển từ ml sang L
-                    targetAmount = targetAmount / 1000f
-                )
+                if (isReady) {
+                    WaterHeader(
+                        currentAmount = dailyTotal / 1000f,
+                        targetAmount = targetAmount / 1000f
+                    )
 
-                WaterContent(
-                    currentAmount = dailyTotal / 1000f,
-                    targetAmount = targetAmount / 1000f,
-                    waterRecords = waterRecords,
-                    viewModel = viewModel,
-
-                    onAddWater = { amount, type ->
-                        viewModel.addIntake(amount, type)
+                    WaterContent(
+                        currentAmount = dailyTotal / 1000f,
+                        targetAmount = targetAmount / 1000f,
+                        waterRecords = waterRecords,
+                        viewModel = viewModel,
+                        onAddWater = { amount, type ->
+                            viewModel.addIntake(amount, type)
+                        }
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
-                )
+                }
             }
         }
-
         if (showReminderDialog) {
             ReminderSettingsDialog(
                 enabled = reminderEnabled,
                 interval = reminderInterval,
-                onEnabledChange = { reminderEnabled = it },
-                onIntervalChange = { reminderInterval = it },
+                onEnabledChange = {
+                    reminderEnabled = it
+                    // Gọi suspend function trong coroutine
+                    coroutineScope.launch {
+                        preferencesManager.saveReminderSettings(it, reminderInterval)
+                    }
+                },
+                onIntervalChange = {
+                    reminderInterval = it
+                    // Gọi suspend function trong coroutine
+                    coroutineScope.launch {
+                        preferencesManager.saveReminderSettings(reminderEnabled, it)
+                    }
+                },
                 onDismiss = { showReminderDialog = false }
             )
         }

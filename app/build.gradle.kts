@@ -70,6 +70,8 @@ dependencies {
     implementation ("androidx.room:room-runtime:2.7.0")
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.cronet.embedded)
     kapt( "androidx.room:room-compiler:2.7.0")
     implementation( "androidx.room:room-ktx:2.7.0")
     implementation(libs.androidx.core.ktx)
@@ -107,7 +109,10 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
-
+    implementation ("com.google.accompanist:accompanist-insets:0.30.1")
+    implementation ("androidx.compose.animation:animation:1.6.0")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     // Retrofit
     implementation( "com.squareup.retrofit2:retrofit:2.9.0")
     implementation( "com.squareup.retrofit2:converter-moshi:2.9.0")

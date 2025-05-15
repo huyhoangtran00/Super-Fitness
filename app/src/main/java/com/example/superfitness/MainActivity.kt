@@ -82,12 +82,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import com.example.superfitness.location.AndroidLocationManager
+import com.example.superfitness.ui.settings.UserProfileScreen
+import com.example.superfitness.utils.PreferencesManager
 
 class MainActivity : ComponentActivity() {
     private lateinit var userProfileViewModel: UserProfileViewModel
     private lateinit var waterIntakeViewModel: WaterIntakeViewModel
     private lateinit var weatherViewModel : WeatherViewModel
     private lateinit var runViewModel: RunViewModel
+    private lateinit var preferencesManager: PreferencesManager
 
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
@@ -97,6 +100,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        preferencesManager = PreferencesManager(this)
 
         val db = AppDatabase.getDatabase(this)
         val userProfileDao: UserProfileDao = db.userProfileDao()
@@ -156,7 +160,8 @@ class MainActivity : ComponentActivity() {
                     waterIntakeViewModel = waterIntakeViewModel,
                     weatherViewModel = weatherViewModel,
                     runViewModel = runViewModel,
-                    openSettings = ::openAppSettings
+                    openSettings = ::openAppSettings,
+                    preferencesManager = preferencesManager
                 )
             }
         }
@@ -171,6 +176,7 @@ fun AppContent(
     waterIntakeViewModel: WaterIntakeViewModel,
     weatherViewModel: WeatherViewModel,
     runViewModel: RunViewModel,
+    preferencesManager : PreferencesManager,
     openSettings: () -> Unit
 ) {
 
@@ -246,7 +252,7 @@ fun AppContent(
                 )
             }
             composable("water") {
-                WaterTrackingApp(waterIntakeViewModel)
+                WaterTrackingApp(waterIntakeViewModel,  preferencesManager, userProfileViewModel)
             }
             composable(
                 route = RunDestination.route,
@@ -321,7 +327,7 @@ fun AppContent(
                 }
             }
             composable("settings") {
-                Box(modifier = Modifier.fillMaxSize())
+                UserProfileScreen(userProfileViewModel)
             }
 
 
