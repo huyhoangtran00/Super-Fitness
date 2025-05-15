@@ -365,7 +365,7 @@ fun CustomBottomNavigationBar(
                 // Trang chủ
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Home, contentDescription = "Trang chủ") },
-                    label = { Text("Home", style = MaterialTheme.typography.labelSmall) },
+                    label = { Text("Trang chủ", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == HomeDestination.route,
                     onClick = { navController.navigate(HomeDestination.route) }
                 )
@@ -373,14 +373,14 @@ fun CustomBottomNavigationBar(
                 // Hoạt động
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.LocalDrink, contentDescription = "Water Reminder") },
-                    label = { Text("Water", style = MaterialTheme.typography.labelSmall) },
+                    label = { Text("Uống nươc", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == "water",
                     onClick = { navController.navigate("water") }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.DirectionsRun, contentDescription = "Activity") },
-                    label = { Text("Activity", style = MaterialTheme.typography.labelSmall) },
+                    label = { Text("Hoạt động", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == RunDestination.route,
                     onClick = { navController.navigateSingleTopTo(route = RunDestination.route) }
                 )
@@ -388,14 +388,14 @@ fun CustomBottomNavigationBar(
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.WbSunny, contentDescription = "Weather") },
-                    label = { Text("Weather", style = MaterialTheme.typography.labelSmall) },
+                    label = { Text("Thời tiết", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == "weather",
                     onClick = { navController.navigate("weather") }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
-                    label = { Text("Setting", style = MaterialTheme.typography.labelSmall) },
+                    label = { Text("Hồ sơ ", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == "settings",
                     onClick = { navController.navigate("settings") }
                 )
