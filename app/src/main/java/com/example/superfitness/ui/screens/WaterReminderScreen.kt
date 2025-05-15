@@ -1,6 +1,7 @@
 package com.example.superfitness.ui.screens
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -41,42 +42,80 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.superfitness.data.local.db.entity.WaterIntake
+import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
+import com.example.superfitness.utils.PreferencesManager
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WaterTrackingApp(viewModel: WaterIntakeViewModel) {
+fun WaterTrackingApp(viewModel: WaterIntakeViewModel,     preferencesManager: PreferencesManager , userProfileViewModel: UserProfileViewModel// Thêm vào constructor
+) {    val context = LocalContext.current
+
     val waterRecords by viewModel.intakesByDate.collectAsState(initial = emptyList())
     val dailyTotal by viewModel.dailyTotal.collectAsState()
-    val targetAmount = 2000 // 2L = 2000ml
-
-    var showReminderDialog by remember { mutableStateOf(false) }
-    var reminderEnabled by remember { mutableStateOf(false) }
-    var reminderInterval by remember { mutableStateOf(60) } // phút
-
-    val context = LocalContext.current
-    val notificationLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
+    val coroutineScope = rememberCoroutineScope()  // ← tạo scope
+    var targetAmount by remember { mutableStateOf(0f) }
+    var isTargetLoaded by remember { mutableStateOf(false) }
+    val isReady = isTargetLoaded && targetAmount > 0f
+    // Notification permission handling
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) {
-            showNotification(context, "Đã đến giờ uống nước!", "Bạn đã uống đủ nước chưa?")
+        if (!isGranted) {
+            Log.w("Notification", "Permission denied")
         }
     }
 
-    // Xử lý nhắc nhở định kỳ
+    // Create notification channel
+    LaunchedEffect(Unit) {
+        createNotificationChannel(context)
+    }
+    LaunchedEffect(Unit) {
+        targetAmount = userProfileViewModel.getWaterTargetValue(1)
+        isTargetLoaded = true
+
+    }
+    var showReminderDialog by remember { mutableStateOf(false) }
+    // Đọc settings từ DataStore
+    val reminderSettings by preferencesManager.reminderSettings.collectAsState(initial = Pair(false, 60))
+    var (reminderEnabled, reminderInterval) = reminderSettings
+
+    // Load initial settings
+    LaunchedEffect(Unit) {
+        preferencesManager.reminderSettings.collect { settings ->
+            reminderEnabled = settings.first
+            reminderInterval = settings.second
+        }
+    }
+    // Reminder logic
     LaunchedEffect(reminderEnabled, reminderInterval) {
         if (reminderEnabled) {
-            while (true) {
-                delay(TimeUnit.MINUTES.toMillis(reminderInterval.toLong()))
-                if (ContextCompat.checkSelfPermission(
+            while (isActive) {
+                // Check current state again in case it changed during delay
+                if (!reminderEnabled) break
+
+                // Check and request permission if needed
+                val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ContextCompat.checkSelfPermission(
                         context,
                         Manifest.permission.POST_NOTIFICATIONS
                     ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    showNotification(context, "Đã đến giờ uống nước!", "Bạn đã uống đủ nước chưa?")
+                } else {
+                    true
                 }
+
+                if (hasPermission) {
+                    showNotification(context, "Nhắc nhở uống nước", "Bạn ơi hãy uống nước nào !")
+                } else {
+                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+
+                delay(TimeUnit.MINUTES.toMillis(reminderInterval.toLong()))
             }
         }
     }
@@ -103,73 +142,93 @@ fun WaterTrackingApp(viewModel: WaterIntakeViewModel) {
                     .background(Color.White) // ⬅️ Đổi màu nền thành trắng
                     .padding(padding)
             ) {
-                WaterHeader(
-                    currentAmount = dailyTotal / 1000f, // Chuyển từ ml sang L
-                    targetAmount = targetAmount / 1000f
-                )
+                if (isReady) {
+                    WaterHeader(
+                        currentAmount = dailyTotal / 1000f,
+                        targetAmount = targetAmount / 1000f
+                    )
 
-                WaterContent(
-                    currentAmount = dailyTotal / 1000f,
-                    targetAmount = targetAmount / 1000f,
-                    waterRecords = waterRecords,
-                    viewModel = viewModel,
-
-                    onAddWater = { amount, type ->
-                        viewModel.addIntake(amount, type)
+                    WaterContent(
+                        currentAmount = dailyTotal / 1000f,
+                        targetAmount = targetAmount / 1000f,
+                        waterRecords = waterRecords,
+                        viewModel = viewModel,
+                        onAddWater = { amount, type ->
+                            viewModel.addIntake(amount, type)
+                        }
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
-                )
+                }
             }
         }
-
         if (showReminderDialog) {
             ReminderSettingsDialog(
                 enabled = reminderEnabled,
                 interval = reminderInterval,
-                onEnabledChange = { reminderEnabled = it },
-                onIntervalChange = { reminderInterval = it },
+                preferencesManager = preferencesManager, // Thêm parameter này
                 onDismiss = { showReminderDialog = false }
             )
         }
+
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ReminderSettingsDialog(
     enabled: Boolean,
     interval: Int,
-    onEnabledChange: (Boolean) -> Unit,
-    onIntervalChange: (Int) -> Unit,
+    preferencesManager: PreferencesManager, // Thêm parameter preferencesManager
     onDismiss: () -> Unit
 ) {
-    val intervalOptions = listOf(1,30, 60, 90, 120) // phút
+    var currentEnabled by remember { mutableStateOf(enabled) }
+    var currentInterval by remember { mutableStateOf(interval) }
+    val coroutineScope = rememberCoroutineScope()
+    val intervalOptions = listOf(1,30, 60, 90, 120)
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Cài đặt nhắc nhở") },
-
         text = {
             Column {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Bật nhắc nhở")
                     Switch(
-                        checked = enabled,
-                        onCheckedChange = onEnabledChange
+                        checked = currentEnabled,
+                        onCheckedChange = { newValue ->
+                            currentEnabled = newValue
+                            coroutineScope.launch {
+                                preferencesManager.saveReminderSettings(newValue, currentInterval)
+                            }
+                        }
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (enabled) {
-                    Text("Khoảng thời gian nhắc nhở (phút)", modifier = Modifier.padding(bottom = 8.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (currentEnabled) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Khoảng thời gian (phút)", modifier = Modifier.padding(bottom = 8.dp))
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         intervalOptions.forEach { option ->
                             FilterChip(
-                                selected = interval == option,
-                                onClick = { onIntervalChange(option) },
+                                selected = currentInterval == option,
+                                onClick = {
+                                    currentInterval = option
+                                    coroutineScope.launch {
+                                        preferencesManager.saveReminderSettings(currentEnabled, option)
+                                    }
+                                },
                                 label = { Text("$option") }
                             )
                         }
@@ -184,7 +243,6 @@ fun ReminderSettingsDialog(
         }
     )
 }
-
 @Composable
 fun WaterHeader(
     currentAmount: Float,
@@ -223,7 +281,7 @@ fun WaterHeader(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Hôm nay bạn đã uống nước chưa",
+                text = "Hôm nay bạn đã uống nước chưa ? ",
                 fontSize = 16.sp,
                 color = Color(0xFF333333) // Màu chữ đậm
             )
@@ -584,15 +642,15 @@ data class WaterRecord(
     val time: String
 )
 
-// Hàm tạo notification channel
-fun createNotificationChannel(context: Context) {
+// Notification functions
+private fun createNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val channel = NotificationChannel(
             "water_reminder_channel",
             "Nhắc nhở uống nước",
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-            description = "Nhắc nhở bạn uống nước định kỳ"
+            description = "Nhắc nhở định kỳ uống nước"
         }
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -602,7 +660,8 @@ fun createNotificationChannel(context: Context) {
 
 // Hàm hiển thị notification
 // Hàm hiển thị notification đã sửa
-fun showNotification(context: Context, title: String, message: String) {
+
+private fun showNotification(context: Context, title: String, message: String) {
     try {
         val builder = NotificationCompat.Builder(context, "water_reminder_channel")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
@@ -610,23 +669,16 @@ fun showNotification(context: Context, title: String, message: String) {
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
-        if (ActivityCompat.checkSelfPermission(
+        if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
+            NotificationManagerCompat.from(context).notify(1, builder.build())
         }
-        NotificationManagerCompat.from(context).notify(1, builder.build())
     } catch (e: Exception) {
         Log.e("Notification", "Lỗi hiển thị thông báo: ${e.message}")
     }
 }
+
 

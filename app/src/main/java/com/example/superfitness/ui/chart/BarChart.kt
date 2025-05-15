@@ -79,29 +79,48 @@ fun BarChart(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Filled.DirectionsRun,
-                contentDescription = "Run Data",
-                tint = if (isRunDataSelected) Color.Black else Color.Gray,
+            Row(
                 modifier = Modifier
-                    .padding(end = 16.dp)
                     .clickable {
                         selectedData = runData
                         isRunDataSelected = true
                         onSelectionChange(true)
                     }
-            )
-            Icon(
-                imageVector = Icons.Filled.WaterDrop,
-                contentDescription = "Water Data",
-                tint = if (!isRunDataSelected) Color.Black else Color.Gray,
+                    .padding(end = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.DirectionsRun,
+                    contentDescription = "Run Data",
+                    tint = if (isRunDataSelected) Color.Black else Color.Gray
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Chạy bộ",
+                    color = if (isRunDataSelected) Color.Black else Color.Gray
+                )
+            }
+            
+            Row(
                 modifier = Modifier
                     .clickable {
                         selectedData = waterData
                         isRunDataSelected = false
                         onSelectionChange(false)
-                    }
-            )
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.WaterDrop,
+                    contentDescription = "Water Data",
+                    tint = if (!isRunDataSelected) Color.Black else Color.Gray
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Uống nước",
+                    color = if (!isRunDataSelected) Color.Black else Color.Gray
+                )
+            }
         }
         AndroidView(
             modifier = Modifier

@@ -14,13 +14,13 @@ import kotlinx.coroutines.flow.Flow
 interface UserProfileDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(user: UserProfile) : Long
+    suspend fun insert(user: UserProfile): Long
 
     @Update
-    suspend fun update(user: UserProfile) : Int
+    suspend fun update(user: UserProfile): Int
 
     @Delete
-    suspend fun delete(user: UserProfile) : Int
+    suspend fun delete(user: UserProfile): Int
 
     @Query("SELECT * FROM user_profile WHERE id = :userId")
     suspend fun getUserById(userId: Int): UserProfile?
@@ -30,4 +30,13 @@ interface UserProfileDao {
 
     @Query("SELECT COUNT(*) FROM user_profile")
     fun getUserCount(): Flow<Int>
+
+
+    // Lấy BMI của người dùng theo ID (trả về Float)
+    @Query("SELECT bmi FROM user_profile WHERE id = :userId")
+    suspend fun getUserBmi(userId: Int): Float?
+
+    // Lấy cân nặng của người dùng theo ID (trả về Float)
+    @Query("SELECT weight FROM user_profile WHERE id = :userId")
+    suspend fun getUserWeight(userId: Int): Float?
 }
