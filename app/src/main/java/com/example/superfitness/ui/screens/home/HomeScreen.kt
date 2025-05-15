@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -50,7 +51,7 @@ fun HomeScreen(
     runViewModel: RunViewModel,
     waterIntakeViewModel: WaterIntakeViewModel
 ) {
-    val runsList = viewModel.allRuns.collectAsStateWithLifecycle().value
+    val runsList = viewModel.allRuns.collectAsStateWithLifecycle().value.reversed()
     var selectedTab by remember { mutableStateOf(0) }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -87,7 +88,7 @@ fun HomeScreen(
                 } else {
                     LazyColumn(
                         modifier = Modifier
-                            .padding(top = 32.dp, start = 8.dp, end = 8.dp),
+                            .padding(start = 8.dp, end = 8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         items(
