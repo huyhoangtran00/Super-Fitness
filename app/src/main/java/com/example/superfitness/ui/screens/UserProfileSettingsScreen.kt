@@ -218,10 +218,10 @@ private fun ProfileOverview(
                     label = { Text("%.1f".format(bmi)) },
                     colors = FilterChipDefaults.filterChipColors(
                         containerColor = when {
-                            bmi < 18.5 -> Color.Blue
-                            bmi < 25 -> Color.Green
-                            bmi < 30 -> Color.Yellow
-                            else -> Color.Red
+                            bmi < 18.5 -> Color(0xFF81D4FA) // Màu xanh dương nhạt (Underweight)
+                            bmi < 25 -> Color(0xFFA5D6A7)   // Màu xanh lá cây nhạt (Normal)
+                            bmi < 30 -> Color(0xFFFFF59D)   // Màu vàng nhạt (Overweight)
+                            else -> Color(0xFFEF9A9A)       // Màu đỏ nhạt (Obese)
                         },
                         labelColor = MaterialTheme.colorScheme.onSurface // Màu chữ
                     )
