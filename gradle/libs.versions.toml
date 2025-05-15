@@ -1,10 +1,10 @@
 [versions]
-agp = "8.3.0"
+agp = "8.8.0"
 charts = "0.2.2-alpha"
 hiltAndroid = "2.52"
 hiltCompiler = "2.51.1"
 kotlin = "2.0.0"
-coreKtx = "1.13.0"
+coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -20,6 +20,11 @@ roomRuntime = "2.6.1"
 navigationCompose = "2.8.9"
 material3 = "1.2.1"
 runtimeLivedata = "1.7.8"  # Thêm dòng này (phiên bản mới nhất tính đến 7/2024)
+mapsCompose = "6.4.1" #duc
+places = "4.0.0"
+playServicesMaps = "18.1.0"
+playServicesLocation = "21.0.1"
+timber = "5.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +50,11 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
+places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref="playServicesLocation"}
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 

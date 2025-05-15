@@ -95,7 +95,7 @@ fun WeatherCard(
                     painterResource(R.drawable.bg_cool),
                     contentScale = ContentScale.FillBounds
                 )
-                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(horizontal = 8.dp, vertical = 8.dp)
         ) {
             item {
                 Spacer(Modifier.height(40.dp))
@@ -103,7 +103,7 @@ fun WeatherCard(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(320.dp)
+                            .height(330.dp)
                             .background(
                                 Brush.verticalGradient(
                                     colors = listOf(Color(0x44000000), Color(0x55000000)),
@@ -112,7 +112,7 @@ fun WeatherCard(
                                 ),
                                 shape = RoundedCornerShape(16.dp)
                             )
-                            .padding(16.dp)
+                            .padding(8.dp)
                     ) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
@@ -320,31 +320,38 @@ fun HourlyWeatherItem(time: String, temperature: String, rainChance: String, ico
 
 @Composable
 fun WeatherDetailRow(currentWeatherState: WeatherState, uvIndex: Int) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+    LazyRow (
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        WeatherDetailItem(
-            icon = R.drawable.humidity,
-            value = "${currentWeatherState.weatherInfo?.currentWeatherData?.humidity}%",
-            description = "Độ ẩm",
-            endPadding = 4
-        )
-        WeatherDetailItem(
-            icon = R.drawable.rays,
-            value = "$uvIndex",
-            description = "Chỉ số UV",
-            startPadding = 4,
-            endPadding = 4
-        )
-        WeatherDetailItem(
-            icon = R.drawable.ic_eye,
-            value = "${((currentWeatherState.weatherInfo?.currentWeatherData?.visibility ?: 0) / 1000).toInt()} km",
-            description = "Tầm nhìn",
-            startPadding = 4,
-            endPadding = 4
-        )
+        item{
+            WeatherDetailItem(
+                icon = R.drawable.humidity,
+                value = "${currentWeatherState.weatherInfo?.currentWeatherData?.humidity}%",
+                description = "Độ ẩm",
+                endPadding = 4
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+
+            WeatherDetailItem(
+                icon = R.drawable.rays,
+                value = "$uvIndex",
+                description = "Chỉ số UV",
+                startPadding = 4,
+                endPadding = 4
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+
+            WeatherDetailItem(
+                icon = R.drawable.ic_eye,
+                value = "${((currentWeatherState.weatherInfo?.currentWeatherData?.visibility ?: 0) / 1000).toInt()} km",
+                description = "Tầm nhìn",
+                startPadding = 4,
+                endPadding = 4
+            )
+        }
+
     }
 }
 
@@ -358,8 +365,8 @@ fun WeatherDetailItem(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+
         modifier = Modifier
-            .padding(start = startPadding.dp, end = endPadding.dp)
             .background(
                 Brush.verticalGradient(
                     colors = listOf(Color(0x66000000), Color(0x66000000)),
@@ -367,14 +374,14 @@ fun WeatherDetailItem(
                     endY = 500f
                 ), shape = RoundedCornerShape(8.dp)
             )
-            .padding(top = 8.dp, bottom = 8.dp)
-            .width(115.dp)
+            .padding(8.dp)
+            .width(90.dp)
 
     ) {
         Image(
             painter = painterResource(id = icon),
             contentDescription = description,
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = value, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)

@@ -73,7 +73,7 @@ fun UserProfileInputScreen(
                         ) {
                             ageOptions.forEach { ageOption ->
                                 DropdownMenuItem(
-                                text = {Text(ageOption.toString())},
+                                    text = {Text(ageOption.toString())},
                                     onClick = {
                                         selectedAge = ageOption
                                         expanded = false
@@ -163,8 +163,8 @@ fun UserProfileInputScreen(
                             weightOptions.forEach { weightOption ->
                                 DropdownMenuItem(
                                     text = {Text(weightOption.toString())}
-,
-                                            onClick = {
+                                    ,
+                                    onClick = {
                                         selectedWeight = weightOption
                                         expanded = false
                                     }
@@ -194,7 +194,7 @@ fun UserProfileInputScreen(
                                 DropdownMenuItem(
                                     text = {Text(goalOption.toString())}
 
-                                        ,
+                                    ,
                                     onClick = {
                                         selectedGoal = goalOption
                                         expanded = false
