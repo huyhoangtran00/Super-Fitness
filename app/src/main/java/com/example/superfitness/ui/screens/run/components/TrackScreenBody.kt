@@ -140,7 +140,7 @@ fun TrackingStatistics(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("SPEED(Km/h)", style = MaterialTheme.typography.labelSmall)
+            Text("SPEED(min/km)", style = MaterialTheme.typography.labelSmall)
             Text(
                 text = formattedSpeed,
                 style = MaterialTheme.typography.headlineMedium.copy(
