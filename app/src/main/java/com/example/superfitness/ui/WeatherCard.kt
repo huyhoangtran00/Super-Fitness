@@ -2,6 +2,7 @@ package com.example.superfitness.ui
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +21,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,11 +49,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import com.example.superfitness.R
 import com.example.superfitness.common.Utils
 import com.example.superfitness.data.mapper.IndexedWeatherData
 import com.example.superfitness.domain.weather.AirQualityInfo
+import com.example.superfitness.utils.BLUE
+import com.example.superfitness.utils.GREEN
+import com.example.superfitness.utils.RED
 import com.example.superfitness.viewmodel.ForecastWeatherState
 import com.example.superfitness.viewmodel.WeatherState
 import kotlinx.coroutines.delay
@@ -92,57 +102,49 @@ fun WeatherCard(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF0F0F2))
                 .padding(horizontal = 8.dp, vertical = 8.dp)
         ) {
             item {
                 Spacer(Modifier.height(40.dp))
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Box(
+                    Card(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(330.dp)
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(Color(0x44000000), Color(0x55000000)),
-                                    startY = 0f,
-                                    endY = 500f
-                                ),
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(BLUE.toColorInt())),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     ) {
                         Column(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.padding(16.dp).fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Top
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(
                                     modifier = Modifier.wrapContentSize(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Column {
                                         Text(
                                             text = formattedDate,
-                                            color = Color.Black,
-                                            fontSize = 16.sp
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = Color.Black
+                                            )
                                         )
                                         Text(
                                             text = time,
-                                            color = Color.Black,
-                                            fontSize = 20.sp
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = Color.Black
+                                            )
                                         )
                                     }
 
-                                    AsyncImage(
-                                        model = "https://example.com/cloud-icon.png",
-                                        contentDescription = "Cloud Icon",
-                                        modifier = Modifier.size(40.dp)
-                                    )
                                 }
                                 Row(
                                     modifier = Modifier.wrapContentSize(),
@@ -160,8 +162,10 @@ fun WeatherCard(
                                         )
                                         Text(
                                             text = data.weatherType.weatherDesc,
-                                            color = Color.Black,
-                                            fontSize = 16.sp
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = Color.White
+                                            )
                                         )
                                     }
                                 }
@@ -171,35 +175,27 @@ fun WeatherCard(
                             ) {
                                 Text(
                                     text = "${data.temperatureCelsius}°C",
-                                    color = Color.Black,
-                                    fontSize = 48.sp
+                                    style = MaterialTheme.typography.displayMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
                                 )
 
-                                Spacer(Modifier.height(5.dp))
-                                Image(
-                                    painter = painterResource(id = R.drawable.wind),
-                                    contentDescription = "",
-                                    modifier = Modifier.size(32.dp)
+                                Spacer(Modifier.height(16.dp))
+                                Text(
+                                    text = state.address?.getAddressLine(0)?.split(",")?.get(0) + "," +
+                                        state.address?.getAddressLine(0)?.split(",")?.get(1),
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color.White
+                                    )
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(text = "${data.windSpeed} m/s", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black)
-                                Text(text = "Tốc độ gió", fontSize = 14.sp, color = Color.Black)
-                                Spacer(Modifier.height(5.dp))
-                                Text(text = state.address?.getAddressLine(0)?.split(",")?.get(2) ?:
-                                "${state.address?.adminArea}", color =  Color.Black)
+                                Spacer(Modifier.height(8.dp))
                                 Text(
                                     text = activities,
-                                    color = Color(0xFF333333),
-                                    style = TextStyle(
-                                        fontFamily = FontFamily.SansSerif,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 20.sp,
-                                        letterSpacing = 0.5.sp,
-                                        shadow = Shadow(
-                                            color = Color(0x22000000),
-                                            offset = Offset(1f, 1f),
-                                            blurRadius = 2f
-                                        )
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color.White
                                     ),
                                     textAlign = TextAlign.Center
                                 )
@@ -208,16 +204,16 @@ fun WeatherCard(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     Timber.tag(TAG).d("WeatherCard: ====> ${forecastWeatherList.getOrNull(0)} ")
                     Log.d(TAG, "WeatherCard: ====> ${forecastWeatherList.getOrNull(0)?.first} ")
                     Log.d(TAG, "WeatherCard: ====> ${forecastWeatherList.getOrNull(0)?.second} ")
                     WeatherDetailRow(state, forecastWeatherList.getOrNull(0)?.second?.uvIndex ?: 0)
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     AirQualityCard(airQualityState)
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     WeatherHourlyForecast(state.weatherInfo.allWeatherDataList)
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
             }
             items(resultDataMap.size) { index ->
@@ -240,52 +236,49 @@ fun WeatherHourlyForecast(dataResult: List<IndexedWeatherData>) {
 
     val index = dataResult.indexOfFirst { it.data.time >= LocalDateTime.now() }
     val dataWeatherList = dataResult.subList(index, if (index + 24 > dataResult.size) dataResult.size else index + 24)
-    Column(
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(BLUE.toColorInt())),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0x44000000), Color(0x55000000)),
-                    startY = 0f,
-                    endY = 500f
-                ),
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.Start
     ) {
-        Row(
-            modifier = Modifier.wrapContentSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Row(modifier = Modifier.wrapContentSize()) {
-                Image(painter = painterResource(R.drawable.rainy), contentDescription = "", modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.width(10.dp))
-                Text("Khả năng mưa", color = Color.Black)
-            }
-            Spacer(modifier = Modifier.width(30.dp))
-            Row(modifier = Modifier.wrapContentSize()) {
-                Image(painter = painterResource(R.drawable.snowflake), contentDescription = "", modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.width(10.dp))
-                Text("Khả năng tuyết", color = Color.Black)
-            }
-        }
-        Spacer(modifier = Modifier.width(40.dp))
-        LazyRow(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start
         ) {
-            items(dataWeatherList.size) { index ->
-                HourlyWeatherItem(
-                    time = dataWeatherList[index].data.time.format(DateTimeFormatter.ofPattern("HH:mm")),
-                    temperature = "${dataWeatherList[index].data.temperatureCelsius}°",
-                    rainChance = "${dataWeatherList[index].data.precipitation}%",
-                    icon = dataWeatherList[index].data.weatherType.iconRes
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(painter = painterResource(R.drawable.rainy), contentDescription = "", modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = "Khả năng mưa",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(dataWeatherList.size) { index ->
+                    HourlyWeatherItem(
+                        time = dataWeatherList[index].data.time.format(DateTimeFormatter.ofPattern("HH:mm")),
+                        temperature = "${dataWeatherList[index].data.temperatureCelsius}°",
+                        rainChance = "${dataWeatherList[index].data.precipitation}%",
+                        icon = dataWeatherList[index].data.weatherType.iconRes
+                    )
+                }
             }
         }
     }
@@ -299,12 +292,17 @@ fun HourlyWeatherItem(time: String, temperature: String, rainChance: String, ico
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = time, fontSize = 14.sp, color = Color.Black)
+            Text(
+                text = time,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = Color.Black
+                )
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Image(
                 painter = painterResource(id = icon),
                 contentDescription = "Weather Icon",
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -320,10 +318,15 @@ fun HourlyWeatherItem(time: String, temperature: String, rainChance: String, ico
                 Image(
                     painter = painterResource(id = R.drawable.rainy),
                     contentDescription = "Weather Icon",
-                    modifier = Modifier.size(15.dp)
+                    modifier = Modifier.size(16.dp)
                 )
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(text = rainChance, fontSize = 12.sp, color = Color.Cyan)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = rainChance,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = Color.White
+                    )
+                )
             }
         }
     }
@@ -343,21 +346,12 @@ fun WeatherDetailRow(currentWeatherState: WeatherState, uvIndex: Int) {
                 description = "Độ ẩm",
                 endPadding = 4
             )
-            Spacer(modifier = Modifier.width(5.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             WeatherDetailItem(
                 icon = R.drawable.rays,
                 value = "$uvIndex",
                 description = "Chỉ số UV",
-                startPadding = 4,
-                endPadding = 4
-            )
-            Spacer(modifier = Modifier.width(5.dp))
-
-            WeatherDetailItem(
-                icon = R.drawable.ic_eye,
-                value = "${((currentWeatherState.weatherInfo?.currentWeatherData?.visibility ?: 0) / 1000).toInt()} km",
-                description = "Tầm nhìn",
                 startPadding = 4,
                 endPadding = 4
             )
@@ -374,50 +368,65 @@ fun WeatherDetailItem(
     value: String,
     description: String
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-
+    Card(
         modifier = Modifier
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0x66000000), Color(0x66000000)),
-                    startY = 0f,
-                    endY = 500f
-                ), shape = RoundedCornerShape(8.dp)
-            )
-            .padding(8.dp)
-            .width(90.dp)
-
+            .width(180.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(width = 2.dp, color = Color(BLUE.toColorInt()))
     ) {
-        Image(
-            painter = painterResource(id = icon),
-            contentDescription = description,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = value, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black)
-        Text(text = description, fontSize = 14.sp, color = Color.Black)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxSize()
+        ) {
+            Image(
+                painter = painterResource(id = icon),
+                contentDescription = description,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            )
+        }
     }
 }
 
 @Composable
 fun WeatherItem(index: Int, day: String, temperature: String, rainChance: String, icon: Int) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(32.dp)
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color(0x44000000), Color(0x55000000)),
-                        startY = 0f,
-                        endY = 500f
-                    ),
+                    color = Color.White,
                     shape = if (index == 0) RoundedCornerShape(
                         topStart = 8.dp,
                         topEnd = 8.dp
                     ) else RoundedCornerShape(0.dp)
                 )
-                .padding(8.dp),
+                .padding(2.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
@@ -461,6 +470,11 @@ fun WeatherItem(index: Int, day: String, temperature: String, rainChance: String
                 color = Color.Black
             )
         }
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(0.9f),
+            thickness = 1.dp,
+            color = Color(BLUE.toColorInt())
+        )
     }
 }
 

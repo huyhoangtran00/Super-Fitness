@@ -16,7 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import com.example.superfitness.data.local.db.entity.RunEntity
+import com.example.superfitness.utils.GREEN
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,7 +42,7 @@ fun RunHistory(recentRunRecords: List<RunEntity>) {
         ) {
             Text(
                 text = "Lịch sử chạy bộ",
-                color = Color.Black,
+                color = Color(GREEN.toColorInt()),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier

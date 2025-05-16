@@ -6,12 +6,14 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Height
 import androidx.compose.material.icons.filled.MonitorWeight
+import androidx.compose.material.icons.filled.PermIdentity
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.SupervisedUserCircle
@@ -31,13 +34,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.superfitness.data.local.db.entity.UserProfile
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
+import com.example.superfitness.utils.BLUE
+import com.example.superfitness.utils.RED
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,12 +86,15 @@ fun UserProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Hồ sơ cá nhân", style = MaterialTheme.typography.titleLarge) },
+                title = { Text("Hồ sơ cá nhân", style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold
+                )) },
                 actions = {
                     IconButton(onClick = { isEditing = !isEditing }) {
                         Icon(
                             imageVector = if (isEditing) Icons.Default.Close else Icons.Default.Edit,
-                            contentDescription = null
+                            contentDescription = null,
+                            tint = Color(RED.toColorInt())
                         )
                     }
                 }
@@ -115,9 +125,10 @@ fun UserProfileScreen(
                             isEditing = false
                         }
                     },
-                    icon = { Icon(Icons.Default.Save, "Lưu") },
-                    text = { Text("LƯU THAY ĐỔI") },
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    icon = { Icon(Icons.Default.Save, "Lưu", tint = Color(RED.toColorInt())) },
+                    text = { Text("LƯU THAY ĐỔI", color = Color(RED.toColorInt())) },
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    containerColor = Color("#FFE5E0".toColorInt())
                 )
             }
         }
@@ -198,7 +209,7 @@ private fun ProfileOverview(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            InfoItem(icon = Icons.Default.Person, title = "Họ tên", value = name)
+            InfoItem(icon = Icons.Default.PermIdentity, title = "Họ và tên", value = name)
             InfoItem(icon = Icons.Default.Cake, title = "Tuổi", value = "${age} tuổi")
             InfoItem(icon = Icons.Default.SupervisedUserCircle, title = "Giới tính", value = gender)
             InfoItem(icon = Icons.Default.Height, title = "Chiều cao", value = "${height}cm")
@@ -211,7 +222,7 @@ private fun ProfileOverview(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("BMI", style = MaterialTheme.typography.titleMedium)
+                Text("BMI", style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
                 FilterChip(
                     selected = false, // Không cần trạng thái chọn
                     onClick = {}, // Không cần xử lý click
@@ -311,7 +322,11 @@ private fun GenderSelection(gender: String, onGenderSelected: (String) -> Unit) 
                     selected = gender == g,
                     onClick = { onGenderSelected(g) },
                     label = { Text(g) },
-                    leadingIcon = if (gender == g) { { Icon(Icons.Default.Check, null) } } else null
+                    leadingIcon = if (gender == g) { { Icon(Icons.Default.Check, null, tint = Color(RED.toColorInt())) } } else null,
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = Color("#FFE5E0".toColorInt()),
+                        selectedLabelColor = Color(RED.toColorInt())
+                    )
                 )
             }
         }
@@ -363,18 +378,18 @@ private fun NumberInputField(
 }
 
 @Composable
-private fun InfoItem(icon: ImageVector, title: String, value: String) {
+private fun InfoItem(modifier: Modifier = Modifier, icon: ImageVector, title: String, value: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
-        Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
+        Icon(icon, null, tint = Color(RED.toColorInt()))
         Spacer(Modifier.width(16.dp))
-        Column {
-            Text(title, style = MaterialTheme.typography.labelMedium)
-            Text(value, style = MaterialTheme.typography.bodyLarge)
+        Column(modifier = modifier) {
+            Text(title, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold), color = Color.Black)
+            Text(value, style = MaterialTheme.typography.bodyLarge, color = Color.Black, maxLines = 1)
         }
     }
 }

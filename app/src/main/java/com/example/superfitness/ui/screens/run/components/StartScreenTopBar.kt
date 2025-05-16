@@ -25,7 +25,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun StartScreenTopBar(
     modifier: Modifier = Modifier,
-    onCloseScreenClick: () -> Unit
+    onCloseScreenClick: () -> Unit,
+    onGoToSettings: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -51,7 +52,7 @@ fun StartScreenTopBar(
         },
         actions = {
             IconButton(
-                onClick = {},
+                onClick = onGoToSettings,
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,

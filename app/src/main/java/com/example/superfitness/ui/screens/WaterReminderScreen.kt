@@ -37,14 +37,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import com.example.superfitness.data.local.db.entity.WaterIntake
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
 import com.example.superfitness.ui.viewmodel.WaterIntakeViewModel
+import com.example.superfitness.utils.BLUE
+import com.example.superfitness.utils.GREEN
 import com.example.superfitness.utils.PreferencesManager
+import com.example.superfitness.utils.RED
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -124,7 +129,13 @@ fun WaterTrackingApp(viewModel: WaterIntakeViewModel,     preferencesManager: Pr
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Theo dõi nước uống") },
+                    title = {
+                        Text(
+                            text = "Theo dõi nước uống",
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        ) },
                     actions = {
                         IconButton(onClick = { showReminderDialog = true }) {
                             Icon(
@@ -139,8 +150,8 @@ fun WaterTrackingApp(viewModel: WaterIntakeViewModel,     preferencesManager: Pr
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White) // ⬅️ Đổi màu nền thành trắng
-                    .padding(padding)
+                    .background(Color.White)
+                    // ⬅️ Đổi màu nền thành trắng
             ) {
                 if (isReady) {
                     WaterHeader(
@@ -257,25 +268,22 @@ fun WaterHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(250.dp)
-            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
             .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFFE3F2FD), Color(0xFFBBDEFB)) // Gradient nhạt
-                )
+                color = Color("#FFE5E0".toColorInt())
             )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Xin chào!",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF333333) // Màu chữ đậm
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold
+                )
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -297,27 +305,27 @@ fun WaterHeader(
                     progress = 1f,
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White,
-                    strokeWidth = 10.dp
+                    strokeWidth = 16.dp
                 )
 
                 CircularProgressIndicator(
                     progress = animatedProgress,
                     modifier = Modifier.fillMaxSize(),
-                    color = Color(0xFF2196F3), // Màu xanh cho progress
-                    strokeWidth = 10.dp,
+                    color = Color(BLUE.toColorInt()), // Màu xanh cho progress
+                    strokeWidth = 16.dp,
                     strokeCap = StrokeCap.Round
                 )
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "${(animatedProgress * 100).toInt()}%",
-                        color = Color(0xFF333333), // Màu chữ đậm
+                        color = Color(BLUE.toColorInt()), // Màu chữ đậm
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = "%.1fL / %.1fL".format(currentAmount, targetAmount),
-                        color = Color(0xFF333333), // Màu chữ đậm
+                        color = Color(BLUE.toColorInt()), // Màu chữ đậm
                         fontSize = 14.sp
                     )
                 }
@@ -328,6 +336,7 @@ fun WaterHeader(
 
 @Composable
 fun WaterContent(
+    modifier: Modifier = Modifier,
     currentAmount: Float,
     targetAmount: Float,
     waterRecords: List<WaterIntake>,
@@ -354,6 +363,7 @@ fun WaterContent(
     Box(modifier = Modifier.fillMaxSize()) {
         // Chỉ gọi TodayDrinkList 1 lần
         TodayDrinkList(
+            modifier = Modifier.fillMaxSize(),
             waterRecords = waterRecords,
             onEdit = { record ->
                 selectedRecord = record
@@ -366,9 +376,9 @@ fun WaterContent(
             onClick = { showAddDialog = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 16.dp) ,// ⬅️ Thêm khoảng cách với mép
+                .padding(bottom = 16.dp, end = 16.dp),
 
-            containerColor = Color(0xFF2196F3)
+            containerColor = Color(RED.toColorInt())
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -414,7 +424,11 @@ fun AddWaterDialog(
                         FilterChip(
                             selected = amount == option,
                             onClick = { amount = option },
-                            label = { Text("$option ml") }
+                            label = { Text("$option ml") },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Color("#FFE5E0".toColorInt()),
+                                selectedLabelColor = Color.White
+                            )
                         )
                     }
                 }
@@ -425,20 +439,24 @@ fun AddWaterDialog(
                         FilterChip(
                             selected = type == option,
                             onClick = { type = option },
-                            label = { Text(option) }
+                            label = { Text(option) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Color("#FFE5E0".toColorInt()),
+                                selectedLabelColor = Color.White
+                            )
                         )
                     }
                 }
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(amount, type) }) {
+            Button(onClick = { onConfirm(amount, type) }, colors = ButtonDefaults.buttonColors(Color(RED.toColorInt()))) {
                 Text("Xác nhận")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Huỷ")
+                Text("Huỷ", color = Color.Black)
             }
         }
     )
@@ -446,12 +464,13 @@ fun AddWaterDialog(
 
 @Composable
 fun TodayDrinkList(
+    modifier: Modifier = Modifier,
     waterRecords: List<WaterIntake>,
     onEdit: (WaterIntake) -> Unit
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

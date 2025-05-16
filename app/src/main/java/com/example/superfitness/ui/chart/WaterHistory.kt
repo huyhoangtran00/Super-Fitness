@@ -16,7 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import com.example.superfitness.data.local.db.entity.WaterIntake
+import com.example.superfitness.utils.BLUE
+import com.example.superfitness.utils.GREEN
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,7 +43,7 @@ fun WaterHistory(recentWaterIntakes: List<WaterIntake>) {
         ) {
             Text(
                 text = "Lịch sử uống nước",
-                color = Color.Black,
+                color = Color(BLUE.toColorInt()),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier

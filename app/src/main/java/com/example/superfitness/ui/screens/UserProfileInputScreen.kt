@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.superfitness.data.local.db.entity.UserProfile
 import com.example.superfitness.ui.viewmodel.UserProfileViewModel
-import com.google.accompanist.insets.imePadding
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.OutlinedTextFieldDefaults

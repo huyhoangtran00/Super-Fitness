@@ -52,6 +52,7 @@ fun RunScreen(
     viewModel: RunViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onCloseScreenClick: () -> Unit,
     openSettings: () -> Unit,
+    onGoToSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -83,7 +84,8 @@ fun RunScreen(
             onStartClick = {
                 performTrackingService(context, Actions.START_OR_RESUME)
             },
-            onCloseScreenClick = onCloseScreenClick
+            onCloseScreenClick = onCloseScreenClick,
+            onGoToSettings = onGoToSettings
         )
     }
     AnimatedVisibility(!isFirstRun) {
@@ -113,7 +115,8 @@ fun StartScreen(
     isGpsAvailable: Boolean,
     onCloseScreenClick: () -> Unit,
     openSettings: () -> Unit,
-    onStartClick: () -> Unit
+    onStartClick: () -> Unit,
+    onGoToSettings: () -> Unit,
 ) {
     var showDialog by remember {
         mutableStateOf(false)
@@ -123,7 +126,8 @@ fun StartScreen(
         topBar = {
             StartScreenTopBar(
                 modifier = Modifier.fillMaxWidth(),
-                onCloseScreenClick = onCloseScreenClick
+                onCloseScreenClick = onCloseScreenClick,
+                onGoToSettings = onGoToSettings
             )
         },
         bottomBar = {

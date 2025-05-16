@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -84,6 +85,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import com.example.superfitness.location.AndroidLocationManager
 import com.example.superfitness.ui.settings.UserProfileScreen
 import com.example.superfitness.utils.PreferencesManager
+import com.example.superfitness.utils.RED
 
 class MainActivity : ComponentActivity() {
     private lateinit var userProfileViewModel: UserProfileViewModel
@@ -268,6 +270,9 @@ fun AppContent(
                         navController.navigateSingleTopTo(HomeDestination.route)
                     },
                     openSettings = openSettings,
+                    onGoToSettings = {
+                        navController.navigateSingleTopTo("settings")
+                    },
                     modifier = Modifier.fillMaxSize()
             ) }
             composable(
@@ -308,8 +313,6 @@ fun AppContent(
                             forecastState = weatherViewModel.stateForecastWeather,
                             airQualityState = weatherViewModel.airQualityState
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
-
                     }
                     if(weatherViewModel.state.isLoading) {
                         CircularProgressIndicator(
@@ -329,13 +332,6 @@ fun AppContent(
             composable("settings") {
                 UserProfileScreen(userProfileViewModel)
             }
-
-
-            // home thi chieu tien do record ->
-            // bat dau -> muc tieu 5kmmm
-            // uong nuoc
-            // weather
-            // cai dat
         }
     }
 }
@@ -351,6 +347,12 @@ fun CustomBottomNavigationBar(
     val currentDestination = navBackStackEntry?.destination
     val currentRoute  = currentDestination?.route
 
+    val navBarItemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = Color(RED.toColorInt()),
+        selectedTextColor = Color(RED.toColorInt()),
+        indicatorColor = Color("#FFE5E0".toColorInt()),
+    )
+
     AnimatedVisibility(
         visible = bottomBarState.value,
     ) {
@@ -360,14 +362,15 @@ fun CustomBottomNavigationBar(
             horizontalArrangement = Arrangement.Center
         ) {
             NavigationBar(
-                containerColor = Color.White
+                containerColor = Color.White,
             ) { // Dùng NavigationBar của M3 thay cho Row
                 // Trang chủ
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Home, contentDescription = "Trang chủ") },
                     label = { Text("Trang chủ", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == HomeDestination.route,
-                    onClick = { navController.navigate(HomeDestination.route) }
+                    onClick = { navController.navigateSingleTopTo(HomeDestination.route) },
+                    colors = navBarItemColors
                 )
 
                 // Hoạt động
@@ -375,14 +378,16 @@ fun CustomBottomNavigationBar(
                     icon = { Icon(Icons.Filled.LocalDrink, contentDescription = "Water Reminder") },
                     label = { Text("Uống nươc", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == "water",
-                    onClick = { navController.navigate("water") }
+                    onClick = { navController.navigateSingleTopTo("water") },
+                    colors = navBarItemColors
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.DirectionsRun, contentDescription = "Activity") },
                     label = { Text("Hoạt động", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == RunDestination.route,
-                    onClick = { navController.navigateSingleTopTo(route = RunDestination.route) }
+                    onClick = { navController.navigateSingleTopTo(route = RunDestination.route) },
+                    colors = navBarItemColors
                 )
 
 
@@ -390,14 +395,16 @@ fun CustomBottomNavigationBar(
                     icon = { Icon(Icons.Filled.WbSunny, contentDescription = "Weather") },
                     label = { Text("Thời tiết", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == "weather",
-                    onClick = { navController.navigate("weather") }
+                    onClick = { navController.navigateSingleTopTo("weather") },
+                    colors = navBarItemColors
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
                     label = { Text("Hồ sơ ", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == "settings",
-                    onClick = { navController.navigate("settings") }
+                    onClick = { navController.navigateSingleTopTo("settings") },
+                    colors = navBarItemColors
                 )
             }
         }

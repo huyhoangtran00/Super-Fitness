@@ -20,6 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.toColorInt
+import com.example.superfitness.utils.BLUE
+import com.example.superfitness.utils.GREEN
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -92,12 +95,12 @@ fun BarChart(
                 Icon(
                     imageVector = Icons.Filled.DirectionsRun,
                     contentDescription = "Run Data",
-                    tint = if (isRunDataSelected) Color.Black else Color.Gray
+                    tint = if (isRunDataSelected) Color(GREEN.toColorInt()) else Color.Gray
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Chạy bộ",
-                    color = if (isRunDataSelected) Color.Black else Color.Gray
+                    color = if (isRunDataSelected) Color(GREEN.toColorInt()) else Color.Gray
                 )
             }
             
@@ -113,12 +116,12 @@ fun BarChart(
                 Icon(
                     imageVector = Icons.Filled.WaterDrop,
                     contentDescription = "Water Data",
-                    tint = if (!isRunDataSelected) Color.Black else Color.Gray
+                    tint = if (!isRunDataSelected) Color(BLUE.toColorInt()) else Color.Gray
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Uống nước",
-                    color = if (!isRunDataSelected) Color.Black else Color.Gray
+                    color = if (!isRunDataSelected) Color(BLUE.toColorInt()) else Color.Gray
                 )
             }
         }
@@ -154,8 +157,8 @@ fun setupBarChart(barChart: BarChart, dataList: List<ChartData>, isRunData: Bool
     }
 
     val dataSet = BarDataSet(entries, if (isRunData) "Kilometers" else "Liters").apply {
-        color = android.graphics.Color.parseColor("#00C853")
-        valueTextColor = android.graphics.Color.parseColor("#00C853")
+        color = if (isRunData) android.graphics.Color.parseColor("#00C853") else android.graphics.Color.parseColor("#14b5ff")
+        valueTextColor = if (isRunData) android.graphics.Color.parseColor("#00C853") else android.graphics.Color.parseColor("#14b5ff")
         setDrawValues(true)
         valueTextSize = 12f
         valueFormatter = object : ValueFormatter() {
