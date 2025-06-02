@@ -45,7 +45,7 @@ class DefaultAppContainer(
         )
     }
     override val sensorManager: SensorManager by lazy {
-        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        context.getSystemService(SENSOR_SERVICE) as SensorManager
     }
 
 }
