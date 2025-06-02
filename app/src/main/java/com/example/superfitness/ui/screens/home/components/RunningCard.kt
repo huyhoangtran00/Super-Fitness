@@ -69,7 +69,7 @@ fun RunningCard(
                 onClick = onClick
             )
     ) {
-        Column(modifier = Modifier.padding(top = 16.dp, bottom = 32.dp)) {
+        Column(modifier = Modifier.padding(top = 16.dp)) {
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)) {
@@ -127,12 +127,15 @@ fun RunningStatistics(
         Column {
             Text(
                 text = "Distance",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = Color.Gray
+                )
             )
             Text(
                 text = "$distance km",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold
                 )
             )
         }
@@ -140,12 +143,15 @@ fun RunningStatistics(
         Column {
             Text(
                 text = "Pace",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = Color.Gray
+                )
             )
             Text(
-                text = "$averagePace/km",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold
+                text = "$averagePace /km",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold
                 )
             )
         }
@@ -153,12 +159,15 @@ fun RunningStatistics(
         Column {
             Text(
                 text = "Time",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = Color.Gray
+                )
             )
             Text(
                 text = duration,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold
                 )
             )
         }

@@ -5,12 +5,13 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.common.math.LongMath
 
-@Entity(tableName = "run_records")
+@Entity(tableName = "run_activities")
 data class RunEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val timeStamp: Long,
     val distance: Int,
     val duration: Long,
-    val pathPoints: String
+    val pathPoints: String,
+    val steps: Long
 )

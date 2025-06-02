@@ -1,5 +1,6 @@
 package com.example.superfitness.ui.screens.run.components
 
+import android.location.Location
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -20,36 +21,56 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.superfitness.R
 import com.example.superfitness.ui.components.LocationPermissionTextProvider
 import com.example.superfitness.ui.components.PermissionDialog
+import com.example.superfitness.utils.DrawableConverter
 import com.example.superfitness.utils.GREEN
+import com.example.superfitness.utils.MAP_ZOOM
 import com.example.superfitness.utils.RED
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun StartScreenBody(
     modifier: Modifier = Modifier,
+    currentLocation: LatLng?,
     arePermissionsGranted: Boolean,
     isGpsAvailable: Boolean,
     showDialog: Boolean,
     isPermanentlyDeclined: Boolean,
     cancelDialog: () -> Unit,
     launchRationale: () -> Unit,
-    goToSystemSetting: () -> Unit
+    goToSystemSetting: () -> Unit,
 ) {
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(36.73723, 3.08647), 3f)
-    }
+    val cameraPositionState = rememberCameraPositionState()
 
     var showMessage by rememberSaveable { mutableStateOf(false) }
     var showMap by rememberSaveable { mutableStateOf(false) }
+
+    val mapUiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                zoomControlsEnabled = false,
+                compassEnabled = true,
+            ),
+        )
+    }
 
     LaunchedEffect(isGpsAvailable) {
         if (isGpsAvailable) {
@@ -61,9 +82,19 @@ fun StartScreenBody(
         }
     }
 
+    LaunchedEffect(currentLocation) {
+        currentLocation?.let {
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(currentLocation, MAP_ZOOM)
+                )
+            )
+        }
+    }
+
     // Delay map loading to wait for screen animation
     LaunchedEffect(Unit) {
-        delay(600L) // ⏱️ Adjust as needed
+        delay(900L) //
         showMap = true
     }
 
@@ -75,8 +106,20 @@ fun StartScreenBody(
             if (showMap) {
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
+                    uiSettings = mapUiSettings,
                     cameraPositionState = cameraPositionState
-                )
+                ) {
+                    currentLocation?.let {
+                        val currentMarkerState = rememberMarkerState().apply {
+                            position = currentLocation
+                        }
+                        Marker(
+                            state = currentMarkerState,
+                            anchor = Offset(0.5f, 0.5f),
+                            flat = true
+                        )
+                    }
+                }
             } else {
                 Box(
                     modifier = Modifier
@@ -117,7 +160,10 @@ fun StartScreenBody(
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            Text("Running function needs precise location permission")
+            Text(
+                text = "Running function needs \nprecise location permission",
+                textAlign = TextAlign.Center
+            )
             if (showDialog) {
                 PermissionDialog(
                     permissionTextProvider = LocationPermissionTextProvider(),

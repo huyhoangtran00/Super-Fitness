@@ -1,6 +1,9 @@
 package com.example.superfitness.ui.components
 
+import android.R
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,10 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.core.graphics.toColorInt
+import com.example.superfitness.utils.RED
 
 @Composable
 fun PermissionDialog(
@@ -38,40 +44,51 @@ fun PermissionDialog(
             shape = MaterialTheme.shapes.large,
             tonalElevation = AlertDialogDefaults.TonalElevation
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(top = 16.dp)) {
                 Text(
-                    text = "Permission required",
-                    style = MaterialTheme.typography.headlineLarge.copy(
+                    text = "Permission Required",
+                    style = MaterialTheme.typography.headlineSmall.copy(
                         fontWeight = FontWeight.Bold
-                    )
+                    ),
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = permissionTextProvider.getDescription(
                         isPermanentlyDeclined = isPermanentlyDeclined
-                    )
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
-                HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
-                TextButton(
-                    onClick = {
-                        if (isPermanentlyDeclined) {
-                            onGoToSystemSettingsClick()
-                        } else {
-                            onOkClick()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = Color(RED.toColorInt()))
                 ) {
-                    Text(
-                        text = if (isPermanentlyDeclined) {
-                            "Go to app setting"
-                        } else {
-                            "Ok"
+                    TextButton(
+                        onClick = {
+                            if (isPermanentlyDeclined) {
+                                onGoToSystemSettingsClick()
+                            } else {
+                                onOkClick()
+                            }
                         },
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        modifier = Modifier.padding(4.dp).fillMaxWidth()
+                    ) {
+                        Text(
+                            text = if (isPermanentlyDeclined) {
+                                "GO TO APP SETTING"
+                            } else {
+                                "OK"
+                            },
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -86,7 +103,7 @@ class CameraPermissionTextProvider: PermissionTextProvider {
     override fun getDescription(isPermanentlyDeclined: Boolean): String {
         return if(isPermanentlyDeclined) {
             "It seems you permanently declined camera permission. " +
-                    "You can go to the app settings to grant it."
+                    "You can go to the app settings to grant it"
         } else {
             "This app needs access to your camera"
         }

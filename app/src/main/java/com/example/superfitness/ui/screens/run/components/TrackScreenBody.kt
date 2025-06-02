@@ -41,13 +41,13 @@ fun TrackScreenBody(
     modifier: Modifier = Modifier,
     isRunning: Boolean,
     showSaverDialog: Boolean,
-    currentLocation: LatLng,
+    currentLocation: LatLng?,
     pathPoints: List<LatLng>,
     durationTimerInMillis: Long,
     distanceInMeters: Int,
     speedInKmH: Float,
     bearing: Float,
-    steps: Int,
+    steps: Long,
     onDismissDialog: () -> Unit,
     onStopAndSaveClick: () -> Unit,
     onStopAndNotSaveClick: () -> Unit
@@ -140,7 +140,7 @@ fun TrackingStatistics(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("SPEED(Km/h)", style = MaterialTheme.typography.labelSmall)
+            Text("PACE", style = MaterialTheme.typography.labelSmall)
             Text(
                 text = formattedSpeed,
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -148,7 +148,7 @@ fun TrackingStatistics(
                 )
             )
             HorizontalDivider(modifier = Modifier.width(120.dp))
-            Text("PACE", style = MaterialTheme.typography.labelSmall)
+            Text("STEPS", style = MaterialTheme.typography.labelSmall)
             Text(
                 text = steps,
                 style = MaterialTheme.typography.headlineMedium.copy(

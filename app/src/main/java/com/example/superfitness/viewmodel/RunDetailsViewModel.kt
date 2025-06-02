@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.superfitness.data.local.db.entity.RunEntity
 import com.example.superfitness.repository.RunRepository
-import com.example.superfitness.ui.screens.runningdetails.RunDetailsDestination
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -48,7 +47,8 @@ data class RunDetails(
     val timeStamp: Long = 0L,
     val distance: Int = 0,
     val duration: Long = 0L,
-    val pathPoints: String = ""
+    val pathPoints: String = "",
+    val steps: Long = 0L
 )
 
 fun RunDetails.toRunEntity(): RunEntity = RunEntity(
@@ -56,7 +56,8 @@ fun RunDetails.toRunEntity(): RunEntity = RunEntity(
     timeStamp = timeStamp,
     distance = distance,
     duration = duration,
-    pathPoints = pathPoints
+    pathPoints = pathPoints,
+    steps = steps
 )
 
 fun RunEntity.toRunDetails(): RunDetails {
@@ -65,6 +66,7 @@ fun RunEntity.toRunDetails(): RunDetails {
         timeStamp = timeStamp,
         distance = distance,
         duration = duration,
-        pathPoints = pathPoints
+        pathPoints = pathPoints,
+        steps = steps
     )
 }

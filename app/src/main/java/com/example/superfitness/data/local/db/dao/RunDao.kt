@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface RunDao {
 
-    @Query("SELECT * FROM run_records")
+    @Query("SELECT * FROM run_activities")
     fun getAllRuns(): Flow<List<RunEntity>>
 
-    @Query("SELECT * FROM run_records WHERE id = :id")
-    fun getRun(id: Int): Flow<RunEntity>
+    @Query("SELECT * FROM run_activities WHERE id = :id")
+    fun getRun(id: Int): Flow<RunEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRun(item: RunEntity)

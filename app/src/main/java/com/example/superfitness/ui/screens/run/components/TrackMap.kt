@@ -42,7 +42,7 @@ import com.google.maps.android.compose.rememberMarkerState
 fun TrackMap(
     modifier: Modifier = Modifier,
     bearing: Float,
-    currentLocation: LatLng,
+    currentLocation: LatLng?,
     pathPoints: List<LatLng>
 ) {
 
@@ -60,11 +60,13 @@ fun TrackMap(
 
 
     LaunchedEffect(key1 = currentLocation) {
-        cameraPositionState.animate(
-            CameraUpdateFactory.newCameraPosition(
-                CameraPosition.fromLatLngZoom(currentLocation, MAP_ZOOM)
+        currentLocation?.let {
+            cameraPositionState.animate(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(currentLocation, MAP_ZOOM)
+                )
             )
-        )
+        }
     }
 
     GoogleMap(
@@ -73,20 +75,23 @@ fun TrackMap(
         onMapLoaded = { isMapLoaded = true },
         modifier = modifier
     ) {
-        val currentMarkerState = rememberMarkerState()
-        currentMarkerState.position = currentLocation
-
-        Marker(
-            state = currentMarkerState,
-            anchor = Offset(0.5f, 0.5f),
-            rotation = bearing,
-            flat = true,
-            icon = DrawableConverter.bitmapDescriptorFromVector(
-                LocalContext.current,
-                R.drawable.arrow,
-                scale = 1.0
+        currentLocation?.let {
+            val currentMarkerState = rememberMarkerState().apply {
+                position = currentLocation
+            }
+            Marker(
+                state = currentMarkerState,
+                anchor = Offset(0.5f, 0.5f),
+                rotation = bearing,
+                flat = true,
+                icon = DrawableConverter.bitmapDescriptorFromVector(
+                    LocalContext.current,
+                    R.drawable.arrow,
+                    scale = 1.0
+                )
             )
-        )
+        }
+
         if (pathPoints.size > 1) {
             Polyline(
                 points = pathPoints,

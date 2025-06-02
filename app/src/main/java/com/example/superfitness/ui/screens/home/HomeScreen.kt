@@ -48,11 +48,11 @@ fun HomeScreen(
         }
     }
     LazyColumn(
-        modifier = Modifier.padding(top = 32.dp, start = 8.dp, end = 8.dp),
+        modifier = Modifier.padding(top = 32.dp, start = 4.dp, end = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(
-            items = runsList,
+            items = runsList.reversed(),
             key = { item -> item.id }
         ) {item ->
 

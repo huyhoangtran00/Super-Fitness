@@ -1,7 +1,6 @@
 plugins {
     id("com.google.gms.google-services")
-    id("kotlin-kapt")  // Đảm bảo rằng bạn đã thêm dòng này để sử dụng KAPT
-
+    id("com.google.devtools.ksp")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
@@ -49,7 +48,6 @@ android {
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
-
     implementation("com.google.accompanist:accompanist-permissions:0.37.2")
 
     // Google Maps SDK for Android
@@ -61,14 +59,25 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.timber)
 
+    // Retrofit + OkHttp
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.kotlinx)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.okhttp)
 
-    // Room dependencies
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    testImplementation(libs.room.testing)
+    implementation(libs.androidx.room.common)
 
-    implementation ("androidx.room:room-runtime:2.6.1")
+    // DataStore
+    implementation(libs.datastore.preferences)
+    implementation(libs.datastore.core)
+
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
-    kapt( "androidx.room:room-compiler:2.6.1")
-    implementation( "androidx.room:room-ktx:2.6.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -76,16 +85,9 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation("androidx.compose.material3:material3:1.1.2") // Hoặc phiên bản mới nhất
-    implementation("androidx.compose.material:material-icons-extended:1.7.7")
-    implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
-    implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.4.0-alpha11")
-    implementation ("com.airbnb.android:lottie-compose:6.1.0")
-    implementation ("androidx.datastore:datastore-preferences:1.0.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
 
-    implementation(libs.androidx.room.common)
-    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

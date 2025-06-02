@@ -8,9 +8,11 @@ import com.example.superfitness.location.LocationManager
 import com.example.superfitness.repository.RunRepository
 import com.example.superfitness.ui.screens.run.TrackingScreen
 import com.example.superfitness.ui.screens.run.TrackingService
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,8 +29,15 @@ class RunViewModel(
             initialValue = false
         )
 
-    var locationUiState = TrackingService.locationUiState
+    val currentLocation: StateFlow<LatLng?> = locationManager.locationUpdates
+        .map { location -> LatLng(location.latitude, location.longitude) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
 
+    var locationUiState = TrackingService.locationUiState
     /**
      * Add new run to the database
      */

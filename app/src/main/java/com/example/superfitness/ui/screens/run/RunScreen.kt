@@ -36,6 +36,7 @@ import com.example.superfitness.viewmodel.RunViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.delay
 
 object RunDestination : NavigationDestination {
@@ -59,8 +60,9 @@ fun RunScreen(
         )
     )
 
-    val isGpsAvailable = viewModel.isGpsAvailable.collectAsStateWithLifecycle().value
-    val locationUiState = viewModel.locationUiState.collectAsStateWithLifecycle().value
+    val isGpsAvailable by viewModel.isGpsAvailable.collectAsStateWithLifecycle()
+    val currentLocation by viewModel.currentLocation.collectAsStateWithLifecycle()
+    val locationUiState by viewModel.locationUiState.collectAsStateWithLifecycle()
     val isFirstRun = locationUiState.isFirstRun
 
     val showTrackingScreen = remember { mutableStateOf(false) }
@@ -73,6 +75,7 @@ fun RunScreen(
     AnimatedVisibility(isFirstRun) {
         StartScreen(
             modifier = Modifier.fillMaxSize(),
+            currentLocation = currentLocation,
             locationPermissions = locationPermissions,
             isGpsAvailable = isGpsAvailable,
             openSettings = openSettings,
@@ -93,7 +96,8 @@ fun RunScreen(
                         timeStamp = TrackingService.startTime,
                         distance = locationUiState.distanceInMeters,
                         duration = locationUiState.durationTimerInMillis,
-                        pathPoints = LocationsUtils.pathPointsToString(locationUiState.pathPoints)
+                        pathPoints = LocationsUtils.pathPointsToString(locationUiState.pathPoints),
+                        steps = locationUiState.steps
                     )
                 )
             }
@@ -105,6 +109,7 @@ fun RunScreen(
 @Composable
 fun StartScreen(
     modifier: Modifier = Modifier,
+    currentLocation: LatLng?,
     locationPermissions: MultiplePermissionsState,
     isGpsAvailable: Boolean,
     onCloseScreenClick: () -> Unit,
@@ -139,6 +144,7 @@ fun StartScreen(
         }
     ) { paddingValues ->
         StartScreenBody(
+            currentLocation = currentLocation,
             arePermissionsGranted = locationPermissions.allPermissionsGranted,
             isGpsAvailable = isGpsAvailable,
             showDialog = showDialog,

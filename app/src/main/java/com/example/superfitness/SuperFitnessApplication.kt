@@ -11,6 +11,7 @@ import com.example.superfitness.utils.CHANNEL_ID
 
 class SuperFitnessApplication: Application() {
     lateinit var container: AppContainer
+        private set
 
     override fun onCreate() {
         super.onCreate()

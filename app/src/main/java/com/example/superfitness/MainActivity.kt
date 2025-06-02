@@ -1,5 +1,6 @@
 package com.example.superfitness
 
+import RunDetailsScreen
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -10,70 +11,44 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.ViewModelProvider
+import androidx.core.graphics.toColorInt
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.superfitness.data.local.db.AppDatabase
-import com.example.superfitness.data.local.db.dao.UserProfileDao
-import com.example.superfitness.data.repository.UserProfileRepository
 import com.example.superfitness.ui.screens.run.RunDestination
 import com.example.superfitness.ui.screens.run.RunScreen
-import com.example.superfitness.ui.screens.WaterTrackingApp
-import com.example.superfitness.ui.viewmodel.UserProfileViewModel
-import com.example.superfitness.viewmodel.UserProfileViewModelFactory
-import com.example.superfitness.ui.screens.UserProfileInputScreen
 import com.example.superfitness.ui.screens.home.HomeDestination
 import com.example.superfitness.ui.screens.home.HomeScreen
-import com.example.superfitness.ui.screens.runningdetails.RunDetailsDestination
-import com.example.superfitness.ui.screens.runningdetails.RunDetailsDestination.runItemIdArg
-import com.example.superfitness.ui.screens.runningdetails.RunDetailsScreen
+import com.example.superfitness.utils.RED
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import kotlin.collections.listOf
 
 class MainActivity : ComponentActivity() {
-    private lateinit var userProfileViewModel: UserProfileViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val db = AppDatabase.getDatabase(this)
-        val userProfileDao: UserProfileDao = db.userProfileDao()
-        val userProfileRepository = UserProfileRepository(userProfileDao)
-        val factory = UserProfileViewModelFactory(userProfileRepository)
-        userProfileViewModel = ViewModelProvider(this, factory).get(UserProfileViewModel::class.java)
-
         setContent {
             MaterialTheme {
                 MainScreen(
-                    userProfileViewModel,
                     openSettings = ::openAppSettings
                 )
             }
@@ -84,7 +59,6 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainScreen(
-    viewModel: UserProfileViewModel,
     openSettings: () -> Unit
 ) {
 
@@ -115,7 +89,7 @@ fun MainScreen(
             startDestination = HomeDestination.route,
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable("record") { UserProfileInputScreen(viewModel) }
+            // Home Screen
             composable(
                 route = HomeDestination.route
             ) {
@@ -128,7 +102,8 @@ fun MainScreen(
                     }
                 )
             }
-            composable("water") { WaterTrackingApp() }
+
+            // Run Screen
             composable(
                 route = RunDestination.route,
                 enterTransition = {
@@ -145,6 +120,8 @@ fun MainScreen(
                     openSettings = openSettings,
                     modifier = Modifier.fillMaxSize()
             ) }
+
+            // Run Details Screen
             composable(
                 route = RunDetailsDestination.routeWithArgs,
                 arguments = RunDetailsDestination.arguments,
@@ -155,7 +132,6 @@ fun MainScreen(
                     )
                 }
             ) {navBackStackEntry ->
-
                 RunDetailsScreen(
                     modifier = Modifier.fillMaxSize(),
                     onBackClick = {
@@ -163,15 +139,6 @@ fun MainScreen(
                     }
                 )
             }
-            composable("weather") { UserProfileInputScreen(viewModel) }
-            composable("settings") { UserProfileInputScreen(viewModel) }
-
-
-            // home thi chieu tien do record ->
-            // bat dau -> muc tieu 5kmmm
-            // uong nuoc
-            // weather
-            // cai dat
         }
     }
 }
@@ -186,6 +153,12 @@ fun CustomBottomNavigationBar(
     // Fetch the current destination
     val currentDestination = navBackStackEntry?.destination
     val currentRoute  = currentDestination?.route
+
+    val navBarItemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = Color(RED.toColorInt()),
+        selectedTextColor = Color(RED.toColorInt()),
+        indicatorColor = Color("#FFE5E0".toColorInt()),
+    )
 
     AnimatedVisibility(
         visible = bottomBarState.value,
@@ -203,22 +176,16 @@ fun CustomBottomNavigationBar(
                     icon = { Icon(Icons.Filled.Home, contentDescription = "Trang chủ") },
                     label = { Text("Home", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == HomeDestination.route,
-                    onClick = { navController.navigate(HomeDestination.route) }
-                )
-
-                // Hoạt động
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.LocalDrink, contentDescription = "Water Reminder") },
-                    label = { Text("Water", style = MaterialTheme.typography.labelSmall) },
-                    selected = currentRoute == "water",
-                    onClick = { navController.navigate("water") }
+                    onClick = { navController.navigate(HomeDestination.route) },
+                    colors = navBarItemColors
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.DirectionsRun, contentDescription = "Activity") },
                     label = { Text("Activity", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == RunDestination.route,
-                    onClick = { navController.navigateSingleTopTo(route = RunDestination.route) }
+                    onClick = { navController.navigateSingleTopTo(route = RunDestination.route) },
+                    colors = navBarItemColors
                 )
 
 
@@ -226,14 +193,8 @@ fun CustomBottomNavigationBar(
                     icon = { Icon(Icons.Filled.WbSunny, contentDescription = "Weather") },
                     label = { Text("Weather", style = MaterialTheme.typography.labelSmall) },
                     selected = currentRoute == "weather",
-                    onClick = { navController.navigate("weather") }
-                )
-
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
-                    label = { Text("Setting", style = MaterialTheme.typography.labelSmall) },
-                    selected = currentRoute == "settings",
-                    onClick = { navController.navigate("settings") }
+                    onClick = { },
+                    colors = navBarItemColors
                 )
             }
         }

@@ -1,6 +1,8 @@
 package com.example.superfitness.location
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Location
 import android.os.Looper
 import com.example.superfitness.utils.FATEST_LOCATION_INTERVAL
 import com.example.superfitness.utils.LOCATION_UPDATE_INTERVAL
@@ -9,6 +11,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.channels.awaitClose
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 interface LocationManager {
     val isGpsAvailable: Flow<Boolean>
+    val locationUpdates: Flow<Location>
 }
 
 class AndroidLocationManager(
@@ -24,32 +28,31 @@ class AndroidLocationManager(
     private val fusedLocationClient: FusedLocationProviderClient
 ): LocationManager {
 
+    private val locationRequest = LocationRequest
+        .Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_UPDATE_INTERVAL)
+        .setMinUpdateIntervalMillis(FATEST_LOCATION_INTERVAL)
+        .setMaxUpdateDelayMillis(LOCATION_UPDATE_INTERVAL)
+        .build()
     override val isGpsAvailable: Flow<Boolean>
         get() = callbackFlow {
 
             if (!context.hasLocationPermission()) {
                 trySend(false)
-                close()
+                close() // close the flow if no permission
                 return@callbackFlow
             }
 
-            val callback = object : LocationCallback() {
+            val availabilityCallback = object : LocationCallback() {
                 override fun onLocationAvailability(p0: LocationAvailability) {
                     super.onLocationAvailability(p0)
                     trySend(p0.isLocationAvailable)
                 }
             }
 
-            val locationRequest = LocationRequest
-                .Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_UPDATE_INTERVAL)
-                .setMinUpdateIntervalMillis(FATEST_LOCATION_INTERVAL)
-                .setMaxUpdateDelayMillis(LOCATION_UPDATE_INTERVAL)
-                .build()
-
             try {
                 fusedLocationClient.requestLocationUpdates(
                     locationRequest,
-                    callback,
+                    availabilityCallback,
                     Looper.getMainLooper()
                 )
             } catch (e: SecurityException) {
@@ -57,8 +60,36 @@ class AndroidLocationManager(
             }
 
             // Stop updates when Flow is closed
-            awaitClose { fusedLocationClient.removeLocationUpdates(callback) }
+            awaitClose { fusedLocationClient.removeLocationUpdates(availabilityCallback) }
         }
+    override val locationUpdates: Flow<Location>
+        get() = callbackFlow {
+            if (!context.hasLocationPermission()) {
+                close()
+                return@callbackFlow
+            }
 
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult) {
+                    super.onLocationResult(result)
+                    result.lastLocation?.let { location ->
+                        trySend(location)
+                    }
+                }
+            }
 
+            try {
+                fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
+                )
+            } catch (e: SecurityException) {
+                // Handle permission issues
+            }
+
+            awaitClose {
+                fusedLocationClient.removeLocationUpdates(locationCallback)
+            }
+        }
 }
