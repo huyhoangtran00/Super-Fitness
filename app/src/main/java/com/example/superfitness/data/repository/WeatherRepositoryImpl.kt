@@ -1,0 +1,25 @@
+package com.example.superfitness.data.repository
+
+import com.example.superfitness.data.mapper_impl.ApiWeatherMapper
+import com.example.superfitness.data.remote.WeatherApi
+import com.example.superfitness.domain.models.Weather
+import com.example.superfitness.domain.repository.WeatherRepository
+import com.example.superfitness.utils.Response
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+
+class WeatherRepositoryImpl (
+    private val weatherApi: WeatherApi,
+    private val apiWeatherMapper: ApiWeatherMapper
+) : WeatherRepository {
+    override fun getWeatherData(): Flow<Response<Weather>> = flow {
+        emit(Response.Loading())
+        val apiWeather = weatherApi.getWeatherData()
+        val weather = apiWeatherMapper.mapToDomain(apiWeather)
+        emit(Response.Success(weather))
+    }.catch { e ->
+        e.printStackTrace()
+        emit(Response.Error(e.message.orEmpty()))
+    }
+}

@@ -88,6 +88,7 @@ class AndroidLocationManager(
                 // Handle permission issues
             }
 
+            // Stop update when Flow is closed
             awaitClose {
                 fusedLocationClient.removeLocationUpdates(locationCallback)
             }

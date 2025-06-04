@@ -1,25 +1,29 @@
 package com.example.superfitness.data.remote.models
 
 
+import android.annotation.SuppressLint
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class ApiDailyWeather(
-    @SerialName("rain_sum")
-    val rainSum: List<Double>,
+    @SerialName("sunrise")
+    val sunrise: List<Int>,
+    @SerialName("sunset")
+    val sunset: List<Int>,
     @SerialName("temperature_2m_max")
     val temperature2mMax: List<Double>,
     @SerialName("temperature_2m_min")
     val temperature2mMin: List<Double>,
     @SerialName("time")
-    val time: List<Int>,
+    val time: List<Long>,
     @SerialName("uv_index_max")
     val uvIndexMax: List<Double>,
     @SerialName("weather_code")
     val weatherCode: List<Int>,
     @SerialName("wind_direction_10m_dominant")
-    val windDirection10mDominant: List<Int>,
+    val windDirection10mDominant: List<Double>,
     @SerialName("wind_speed_10m_max")
     val windSpeed10mMax: List<Double>
 )

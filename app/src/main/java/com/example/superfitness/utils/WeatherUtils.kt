@@ -18,12 +18,6 @@ object WeatherUtils {
         "North West"
     )
 
-
-    fun formatUnixDate(pattern: String, time: Long): String {
-        val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-        return sdf.format(time * 1000)
-    }
-
     fun formatNormalDate(pattern: String, time: Long): String {
         val sdf = SimpleDateFormat(pattern, Locale.getDefault())
         return sdf.format(time)
@@ -64,6 +58,11 @@ object WeatherUtils {
     fun isTodayDate(day: String): Boolean {
         val todayDate = formatNormalDate("E", Date().time)
         return todayDate.lowercase() == day.lowercase()
+    }
+
+    fun formatUnixDate(pattern: String, time: Long): String {
+        val sdf = SimpleDateFormat(pattern, Locale.getDefault())
+        return sdf.format(time * 1000)
     }
 }
 

@@ -49,7 +49,6 @@ class TrackingService : Service() {
         val app = application as SuperFitnessApplication
         locationManager = app.container.locationManager
         sensorManager = app.container.sensorManager
-
     }
 
     override fun onDestroy() {

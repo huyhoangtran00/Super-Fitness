@@ -37,6 +37,8 @@ import com.example.superfitness.ui.screens.run.RunDestination
 import com.example.superfitness.ui.screens.run.RunScreen
 import com.example.superfitness.ui.screens.home.HomeDestination
 import com.example.superfitness.ui.screens.home.HomeScreen
+import com.example.superfitness.ui.screens.weather.WeatherDestination
+import com.example.superfitness.ui.screens.weather.WeatherScreen
 import com.example.superfitness.utils.RED
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
@@ -103,6 +105,7 @@ fun MainScreen(
                 )
             }
 
+
             // Run Screen
             composable(
                 route = RunDestination.route,
@@ -139,6 +142,15 @@ fun MainScreen(
                     }
                 )
             }
+
+            // Weather Screen
+            composable(
+                route = WeatherDestination.route
+            ) {
+                WeatherScreen(
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }
@@ -170,7 +182,7 @@ fun CustomBottomNavigationBar(
         ) {
             NavigationBar(
                 containerColor = Color.White
-            ) { // Dùng NavigationBar của M3 thay cho Row
+            ) {
                 // Trang chủ
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Home, contentDescription = "Trang chủ") },
@@ -188,12 +200,11 @@ fun CustomBottomNavigationBar(
                     colors = navBarItemColors
                 )
 
-
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.WbSunny, contentDescription = "Weather") },
                     label = { Text("Weather", style = MaterialTheme.typography.labelSmall) },
-                    selected = currentRoute == "weather",
-                    onClick = { },
+                    selected = currentRoute == WeatherDestination.route,
+                    onClick = { navController.navigateSingleTopTo(route = WeatherDestination.route) },
                     colors = navBarItemColors
                 )
             }

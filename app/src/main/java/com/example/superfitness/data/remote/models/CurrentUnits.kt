@@ -10,8 +10,6 @@ data class CurrentUnits(
     val interval: String,
     @SerialName("is_day")
     val isDay: String,
-    @SerialName("rain")
-    val rain: String,
     @SerialName("temperature_2m")
     val temperature2m: String,
     @SerialName("time")

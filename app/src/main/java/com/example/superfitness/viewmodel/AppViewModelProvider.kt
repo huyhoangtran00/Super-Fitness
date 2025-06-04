@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.superfitness.SuperFitnessApplication
-import com.example.superfitness.viewmodel.RunViewModel
+import com.example.superfitness.ui.screens.weather.WeatherViewModel
 
 /**
  * Manual dependency injection
@@ -31,6 +31,11 @@ object AppViewModelProvider {
             RunDetailsViewModel(
                 this.createSavedStateHandle(),
                 superFitnessApplication().container.runRepository
+            )
+        }
+        initializer {
+            WeatherViewModel(
+                superFitnessApplication().container.weatherRepository
             )
         }
     }

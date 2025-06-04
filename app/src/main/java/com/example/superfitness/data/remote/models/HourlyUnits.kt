@@ -6,12 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HourlyUnits(
-    @SerialName("cloud_cover")
-    val cloudCover: String,
-    @SerialName("rain")
-    val rain: String,
-    @SerialName("relative_humidity_2m")
-    val relativeHumidity2m: String,
     @SerialName("temperature_2m")
     val temperature2m: String,
     @SerialName("time")

@@ -1,25 +1,27 @@
 package com.example.superfitness.data.remote.models
 
-
+import android.annotation.SuppressLint
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class ApiWeather(
     @SerialName("current")
-    val apiCurrentWeather: ApiCurrentWeather,
+    val current: ApiCurrentWeather,
     @SerialName("current_units")
     val currentUnits: CurrentUnits,
     @SerialName("daily")
-    val apiDailyWeather: ApiDailyWeather,
+    val daily: ApiDailyWeather,
     @SerialName("daily_units")
     val dailyUnits: DailyUnits,
     @SerialName("elevation")
-    val elevation: Int,
+    val elevation: Double,
     @SerialName("generationtime_ms")
     val generationtimeMs: Double,
     @SerialName("hourly")
-    val apiHourlyWeather: ApiHourlyWeather,
+    val hourly: ApiHourlyWeather,
     @SerialName("hourly_units")
     val hourlyUnits: HourlyUnits,
     @SerialName("latitude")
