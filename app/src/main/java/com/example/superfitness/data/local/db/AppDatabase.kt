@@ -36,7 +36,7 @@ import com.example.superfitness.data.local.entity.WeatherEntity
         AirQualityEntity::class,
         ForecastWeatherEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(WeatherDataConverter::class)

@@ -38,7 +38,7 @@ fun BottomSheetContent(
     val duration = TimeUtilFormatter.getTime(runItem.duration)
     val distance = DistanceKmFormatter.metersToKm(runItem.distance)
     val averagePace = DistanceKmFormatter.calculateAveragePace(runItem.duration, runItem.distance)
-    val pathPoints = LocationsUtils.stringToPathPoints(runItem.pathPoints)
+    val steps = runItem.steps.toString()
 
     Column(
         modifier = Modifier
@@ -78,7 +78,7 @@ fun BottomSheetContent(
             duration = duration,
             distance = distance,
             averagePace = averagePace,
-            steps = "0",
+            steps = steps,
         )
 
         Spacer(modifier = Modifier.height(16.dp))

@@ -63,7 +63,7 @@ fun StartScreenBody(
 
     // Delay map loading to wait for screen animation
     LaunchedEffect(Unit) {
-        delay(600L) // ⏱️ Adjust as needed
+        delay(600L) //
         showMap = true
     }
 

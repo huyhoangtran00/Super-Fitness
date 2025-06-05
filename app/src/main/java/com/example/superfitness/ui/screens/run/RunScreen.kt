@@ -99,7 +99,8 @@ fun RunScreen(
                         timeStamp = TrackingService.startTime,
                         distance = locationUiState.distanceInMeters,
                         duration = locationUiState.durationTimerInMillis,
-                        pathPoints = LocationsUtils.pathPointsToString(locationUiState.pathPoints)
+                        pathPoints = LocationsUtils.pathPointsToString(locationUiState.pathPoints),
+                        steps = locationUiState.steps
                     )
                 )
             }

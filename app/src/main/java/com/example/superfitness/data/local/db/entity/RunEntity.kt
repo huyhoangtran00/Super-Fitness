@@ -12,5 +12,6 @@ data class RunEntity(
     val timeStamp: Long,
     val distance: Int,
     val duration: Long,
+    val steps: Long,
     val pathPoints: String
 )

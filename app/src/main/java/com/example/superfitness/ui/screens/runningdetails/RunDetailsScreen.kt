@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -171,52 +173,56 @@ fun DetailsTrackMap(
                         cameraPositionState.animate(
                             CameraUpdateFactory.newLatLngBounds(bounds, 100)
                         )
-                        cameraPositionState.animate(
-                            CameraUpdateFactory.zoomIn()
-                        )
                     }
                 }
             }
         }
     }
 
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        uiSettings = mapUiSettings,
-        cameraPositionState = cameraPositionState,
-        onMapLoaded = { isMapLoaded = true }
-    ) {
-        if (pathPoints.size > 1) {
-            Polyline(
-                points = pathPoints,
-                color = Color(RED.toColorInt()),
-                width = POLYLINE_WIDTH
-            )
+    Column(modifier = Modifier.fillMaxSize()) {
+        GoogleMap(
+            modifier = Modifier.weight(1f),
+            uiSettings = mapUiSettings,
+            cameraPositionState = cameraPositionState,
+            onMapLoaded = { isMapLoaded = true }
+        ) {
+            if (pathPoints.size > 1) {
+                Polyline(
+                    points = pathPoints,
+                    color = Color(RED.toColorInt()),
+                    width = POLYLINE_WIDTH
+                )
 
-            Marker(
-                state = rememberMarkerState(position = pathPoints.first()),
-                anchor = Offset(0.5f, 0.5f),
-                icon = DrawableConverter
-                    .bitmapDescriptorFromVector(
-                        LocalContext.current,
-                        R.drawable.baseline_adjust_24,
-                        tint = Color.Blue.toArgb(),
-                        scale = 1.0
-                    )
-            )
+                Marker(
+                    state = rememberMarkerState(position = pathPoints.first()),
+                    anchor = Offset(0.5f, 0.5f),
+                    icon = DrawableConverter
+                        .bitmapDescriptorFromVector(
+                            LocalContext.current,
+                            R.drawable.baseline_adjust_24,
+                            tint = Color.Blue.toArgb(),
+                            scale = 1.0
+                        )
+                )
 
-            Marker(
-                state = rememberMarkerState(position = pathPoints.last()),
-                anchor = Offset(0.5f, 0.5f),
-                icon = DrawableConverter
-                    .bitmapDescriptorFromVector(
-                        LocalContext.current,
-                        R.drawable.baseline_flag_24,
-                        tint = Color(GREEN.toColorInt()).toArgb(),
-                        scale = 1.5
-                    )
-            )
+                Marker(
+                    state = rememberMarkerState(position = pathPoints.last()),
+                    anchor = Offset(0.5f, 0.5f),
+                    icon = DrawableConverter
+                        .bitmapDescriptorFromVector(
+                            LocalContext.current,
+                            R.drawable.baseline_flag_24,
+                            tint = Color(GREEN.toColorInt()).toArgb(),
+                            scale = 1.5
+                        )
+                )
 
+            }
+        }
+        AnimatedVisibility(bottomScaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+            Box(
+                modifier = Modifier.fillMaxWidth().height(96.dp)
+            )
         }
     }
 
