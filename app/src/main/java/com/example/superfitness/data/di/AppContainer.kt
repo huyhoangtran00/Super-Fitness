@@ -1,20 +1,20 @@
-package com.example.superfitness.data
+package com.example.superfitness.data.di
 
 import android.content.Context
 import android.content.Context.SENSOR_SERVICE
 import android.hardware.SensorManager
-import com.example.superfitness.connectivity.AndroidConnectivityObserver
-import com.example.superfitness.connectivity.ConnectivityObserver
+import com.example.superfitness.data.connectivity.AndroidConnectivityObserver
+import com.example.superfitness.data.connectivity.ConnectivityObserver
 import com.example.superfitness.data.local.db.AppDatabase
 import com.example.superfitness.data.mapper_impl.ApiDailyMapper
 import com.example.superfitness.data.mapper_impl.ApiHourlyMapper
 import com.example.superfitness.data.mapper_impl.ApiWeatherMapper
-import com.example.superfitness.data.mapper_impl.CurrentWeatherMapper
+import com.example.superfitness.data.mapper_impl.ApiCurrentWeatherMapper
 import com.example.superfitness.data.remote.WeatherApi
-import com.example.superfitness.location.AndroidLocationManager
-import com.example.superfitness.location.LocationManager
+import com.example.superfitness.data.location.LocationManagerImpl
 import com.example.superfitness.data.repository.OfflineRunRepository
 import com.example.superfitness.data.repository.WeatherRepositoryImpl
+import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.domain.repository.RunRepository
 import com.example.superfitness.domain.repository.WeatherRepository
 import com.example.superfitness.utils.K
@@ -23,7 +23,6 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-
 
 interface AppContainer {
     val connectivityObserver: ConnectivityObserver
@@ -57,7 +56,7 @@ class DefaultAppContainer(
     }
 
     override val locationManager: LocationManager by lazy {
-        AndroidLocationManager(
+        LocationManagerImpl(
             context,
             LocationServices.getFusedLocationProviderClient(context)
         )
@@ -68,6 +67,7 @@ class DefaultAppContainer(
 
     override val runRepository: RunRepository by lazy {
         val database = AppDatabase.getDatabase(context)
+
         OfflineRunRepository(
             database.runDao()
         )
@@ -75,9 +75,9 @@ class DefaultAppContainer(
 
     override val weatherRepository: WeatherRepository by lazy {
         val apiWeatherMapper = ApiWeatherMapper(
-            apiDailyMapper = ApiDailyMapper(),
-            apiHourlyMapper = ApiHourlyMapper(),
-            apiCurrentWeatherMapper = CurrentWeatherMapper()
+            apiDailyWeatherMapper = ApiDailyMapper(),
+            apiHourlyWeatherMapper = ApiHourlyMapper(),
+            apiCurrentWeatherMapper = ApiCurrentWeatherMapper()
         )
 
         WeatherRepositoryImpl(

@@ -4,11 +4,13 @@ import RunDetailsScreen
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -37,13 +39,14 @@ import com.example.superfitness.ui.screens.run.RunDestination
 import com.example.superfitness.ui.screens.run.RunScreen
 import com.example.superfitness.ui.screens.home.HomeDestination
 import com.example.superfitness.ui.screens.home.HomeScreen
-import com.example.superfitness.ui.screens.weather.WeatherDestination
 import com.example.superfitness.ui.screens.weather.WeatherScreen
+import com.example.superfitness.ui.screens.weather.WeatherDestination
 import com.example.superfitness.utils.RED
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 class MainActivity : ComponentActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -58,6 +61,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainScreen(

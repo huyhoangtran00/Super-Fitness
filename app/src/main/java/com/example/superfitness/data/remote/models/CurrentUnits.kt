@@ -10,6 +10,8 @@ data class CurrentUnits(
     val interval: String,
     @SerialName("is_day")
     val isDay: String,
+    @SerialName("relative_humidity_2m")
+    val relativeHumidity2m: String,
     @SerialName("temperature_2m")
     val temperature2m: String,
     @SerialName("time")
@@ -19,5 +21,7 @@ data class CurrentUnits(
     @SerialName("wind_direction_10m")
     val windDirection10m: String,
     @SerialName("wind_speed_10m")
-    val windSpeed10m: String
+    val windSpeed10m: String,
+    @SerialName("apparent_temperature")
+    val apparentTemperature: String,
 )

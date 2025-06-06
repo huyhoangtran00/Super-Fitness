@@ -11,6 +11,8 @@ data class ApiCurrentWeather(
     val interval: Int,
     @SerialName("is_day")
     val isDay: Int,
+    @SerialName("relative_humidity_2m")
+    val relativeHumidity2m: Int,
     @SerialName("temperature_2m")
     val temperature2m: Double,
     @SerialName("time")
@@ -20,5 +22,7 @@ data class ApiCurrentWeather(
     @SerialName("wind_direction_10m")
     val windDirection10m: Double,
     @SerialName("wind_speed_10m")
-    val windSpeed10m: Double
+    val windSpeed10m: Double,
+    @SerialName("apparent_temperature")
+    val apparentTemperature: Double
 )

@@ -1,4 +1,4 @@
-package com.example.superfitness.viewmodel
+package com.example.superfitness.ui.screens.running_details
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package com.example.superfitness.connectivity
+package com.example.superfitness.data.connectivity
 
 import android.content.Context
 import android.net.ConnectivityManager

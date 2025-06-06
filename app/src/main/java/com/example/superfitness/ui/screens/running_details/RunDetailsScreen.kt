@@ -1,4 +1,5 @@
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,15 +31,15 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.superfitness.R
 import com.example.superfitness.ui.navigation.NavigationDestination
-import com.example.superfitness.ui.screens.runningdetails.components.BottomSheetContent
-import com.example.superfitness.ui.screens.runningdetails.components.TopBackClick
+import com.example.superfitness.ui.screens.running_details.components.BottomSheetContent
+import com.example.superfitness.ui.screens.running_details.components.TopBackClick
 import com.example.superfitness.utils.DrawableConverter
 import com.example.superfitness.utils.GREEN
 import com.example.superfitness.utils.LocationsUtils
 import com.example.superfitness.utils.POLYLINE_WIDTH
 import com.example.superfitness.utils.RED
-import com.example.superfitness.viewmodel.AppViewModelProvider
-import com.example.superfitness.viewmodel.RunDetailsViewModel
+import com.example.superfitness.data.di.AppViewModelProvider
+import com.example.superfitness.ui.screens.running_details.RunDetailsViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -87,7 +88,7 @@ fun RunDetailsScreen(
             )
         },
         sheetContainerColor = Color.White,
-        sheetPeekHeight = 90.dp,
+        sheetPeekHeight = 160.dp,
         sheetSwipeEnabled = true,
         sheetShape = RoundedCornerShape(
             bottomStart = 0.dp,
@@ -147,7 +148,7 @@ fun DetailsTrackMap(
                 when (bottomScaffoldState.bottomSheetState.currentValue) {
                     SheetValue.Expanded -> {
                         cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLngBounds(bounds, 50)
+                            CameraUpdateFactory.newLatLngBounds(bounds, 160)
                         )
                         cameraPositionState.animate(
                             CameraUpdateFactory.zoomOut()
@@ -156,10 +157,7 @@ fun DetailsTrackMap(
 
                     SheetValue.PartiallyExpanded, SheetValue.Hidden -> {
                         cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLngBounds(bounds, 100)
-                        )
-                        cameraPositionState.animate(
-                            CameraUpdateFactory.zoomIn()
+                            CameraUpdateFactory.newLatLngBounds(bounds, 160)
                         )
                     }
                 }
@@ -207,9 +205,11 @@ fun DetailsTrackMap(
 
             }
         }
-        AnimatedVisibility(bottomScaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+        AnimatedVisibility(
+            visible = bottomScaffoldState.bottomSheetState.currentValue == SheetValue.Expanded
+        ) {
             Box(
-                modifier = Modifier.fillMaxWidth().height(128.dp)
+                modifier = Modifier.fillMaxWidth().height(160.dp).background(Color.White)
             )
         }
     }

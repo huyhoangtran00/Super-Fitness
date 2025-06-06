@@ -3,10 +3,9 @@ package com.example.superfitness
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.os.Build
-import com.example.superfitness.data.AppContainer
-import com.example.superfitness.data.DefaultAppContainer
+import com.example.superfitness.data.di.AppContainer
+import com.example.superfitness.data.di.DefaultAppContainer
 import com.example.superfitness.utils.CHANNEL_ID
 
 class SuperFitnessApplication: Application() {

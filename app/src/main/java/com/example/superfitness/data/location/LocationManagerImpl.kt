@@ -1,9 +1,9 @@
-package com.example.superfitness.location
+package com.example.superfitness.data.location
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Looper
+import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.utils.FATEST_LOCATION_INTERVAL
 import com.example.superfitness.utils.LOCATION_UPDATE_INTERVAL
 import com.example.superfitness.utils.hasLocationPermission
@@ -12,18 +12,12 @@ import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-interface LocationManager {
-    val isGpsAvailable: Flow<Boolean>
-    val locationUpdates: Flow<Location>
-}
-
-class AndroidLocationManager(
+class LocationManagerImpl(
     private val context: Context,
     private val fusedLocationClient: FusedLocationProviderClient
 ): LocationManager {

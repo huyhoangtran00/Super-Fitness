@@ -1,4 +1,4 @@
-package com.example.superfitness.ui.screens.runningdetails.components
+package com.example.superfitness.ui.screens.running_details.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row

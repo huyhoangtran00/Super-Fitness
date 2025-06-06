@@ -3,10 +3,11 @@ package com.example.superfitness.data.mapper_impl
 import com.example.superfitness.data.mappers.ApiMapper
 import com.example.superfitness.data.remote.models.ApiCurrentWeather
 import com.example.superfitness.domain.models.CurrentWeather
+import com.example.superfitness.utils.TimeUtilFormatter
 import com.example.superfitness.utils.WeatherInfoItem
 import com.example.superfitness.utils.WeatherUtils
 
-class CurrentWeatherMapper : ApiMapper<CurrentWeather, ApiCurrentWeather> {
+class ApiCurrentWeatherMapper : ApiMapper<CurrentWeather, ApiCurrentWeather> {
     override fun mapToDomain(apiEntity: ApiCurrentWeather): CurrentWeather {
         return CurrentWeather(
             temperature = apiEntity.temperature2m,
@@ -14,12 +15,14 @@ class CurrentWeatherMapper : ApiMapper<CurrentWeather, ApiCurrentWeather> {
             weatherStatus = parseWeatherStatus(apiEntity.weatherCode),
             windDirection = parseWindDirection(apiEntity.windDirection10m),
             windSpeed = apiEntity.windSpeed10m,
-            isDay = apiEntity.isDay == 1
+            isDay = apiEntity.isDay == 1,
+            humidity = apiEntity.relativeHumidity2m,
+            apparentTemperature = apiEntity.apparentTemperature
         )
     }
 
     private fun parseTime(time: Long): String {
-        return WeatherUtils.formatUnixDate("MMM,d", time)
+        return TimeUtilFormatter.getFormattedDate(time)
     }
 
     private fun parseWeatherStatus(code: Int): WeatherInfoItem {

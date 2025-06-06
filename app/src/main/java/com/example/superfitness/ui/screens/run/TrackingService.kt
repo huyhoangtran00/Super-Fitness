@@ -13,7 +13,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.superfitness.R
 import com.example.superfitness.SuperFitnessApplication
-import com.example.superfitness.location.LocationManager
+import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.utils.CHANNEL_ID
 import com.example.superfitness.utils.LocationsUtils
 import com.google.android.gms.maps.model.LatLng
@@ -152,7 +152,7 @@ class TrackingService : Service() {
                     initialSteps = stepsSinceReboot
                 }
 
-                totalSteps = stepsSinceReboot - initialSteps
+                totalSteps += stepsSinceReboot - initialSteps
                 // Update steps
                 _locationUiState.update { it.copy(steps = totalSteps) }
             }

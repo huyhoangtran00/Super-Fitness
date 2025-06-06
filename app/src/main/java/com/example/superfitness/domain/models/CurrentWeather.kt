@@ -8,5 +8,7 @@ data class CurrentWeather(
     val weatherStatus: WeatherInfoItem,
     val windDirection: String,
     val windSpeed: Double,
-    val isDay: Boolean
+    val isDay: Boolean,
+    val humidity: Int,
+    val apparentTemperature: Double
 )

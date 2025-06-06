@@ -31,8 +31,8 @@ object WeatherUtils {
         return when (code) {
             0 -> WeatherInfoItem("Clear sky", R.drawable.clear_sky)
             1 -> WeatherInfoItem("Mainly clear", R.drawable.mainly_clear)
-            2 -> WeatherInfoItem("partly cloudy", R.drawable.mainly_clear)
-            3 -> WeatherInfoItem("overcast", R.drawable.over_cast)
+            2 -> WeatherInfoItem("Partly cloudy", R.drawable.mainly_clear)
+            3 -> WeatherInfoItem("Overcast", R.drawable.over_cast)
             45, 48 -> WeatherInfoItem("Fog", R.drawable.fog)
             51, 53, 55,
                 -> WeatherInfoItem("Drizzle", R.drawable.drizzle)

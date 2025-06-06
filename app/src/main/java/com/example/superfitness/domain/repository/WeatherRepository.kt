@@ -5,5 +5,5 @@ import com.example.superfitness.utils.Response
 import kotlinx.coroutines.flow.Flow
 
 interface WeatherRepository {
-    fun getWeatherData(): Flow<Response<Weather>>
+    fun getWeatherData(lat: Double, long: Double): Flow<Response<Weather>>
 }

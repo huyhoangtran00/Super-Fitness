@@ -67,6 +67,23 @@ object TimeUtilFormatter {
         }
     }
 
+    fun getFormattedDate(ms: Long): String {
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = ms
+        }
+
+        val dayOfWeekFormat = SimpleDateFormat("EEEE", Locale.US)
+        val monthFormat = SimpleDateFormat("MMM", Locale.US)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val suffix = getDayOfMonthSuffix(day)
+
+        val dayOfWeek = dayOfWeekFormat.format(calendar.time)
+        val month = monthFormat.format(calendar.time)
+
+
+        return "$dayOfWeek, $month $day$suffix"
+    }
+
     private fun getDayOfMonthSuffix(n: Int): String {
         return if (n in 11..13) "th" else when (n % 10) {
             1 -> "st"

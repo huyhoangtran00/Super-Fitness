@@ -1,4 +1,4 @@
-package com.example.superfitness.viewmodel
+package com.example.superfitness.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,7 +17,7 @@ class HomeViewModel(
     val allRuns: StateFlow<List<RunEntity>> = runRepository.getRunsStream()
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.Companion.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
 }

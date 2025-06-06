@@ -19,8 +19,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.superfitness.R
 import com.example.superfitness.ui.navigation.NavigationDestination
 import com.example.superfitness.ui.screens.home.components.RunningCard
-import com.example.superfitness.viewmodel.AppViewModelProvider
-import com.example.superfitness.viewmodel.HomeViewModel
+import com.example.superfitness.data.di.AppViewModelProvider
+import com.example.superfitness.ui.screens.home.HomeViewModel
 
 object HomeDestination : NavigationDestination {
     override val route = "home screen"

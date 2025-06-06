@@ -13,9 +13,12 @@ class WeatherRepositoryImpl (
     private val weatherApi: WeatherApi,
     private val apiWeatherMapper: ApiWeatherMapper
 ) : WeatherRepository {
-    override fun getWeatherData(): Flow<Response<Weather>> = flow {
+    override fun getWeatherData(lat: Double, long: Double): Flow<Response<Weather>> = flow {
         emit(Response.Loading())
-        val apiWeather = weatherApi.getWeatherData()
+        val apiWeather = weatherApi.getWeatherData(
+            latitude = lat,
+            longitude = long
+        )
         val weather = apiWeatherMapper.mapToDomain(apiWeather)
         emit(Response.Success(weather))
     }.catch { e ->
@@ -23,3 +26,6 @@ class WeatherRepositoryImpl (
         emit(Response.Error(e.message.orEmpty()))
     }
 }
+
+// To do:
+// Save the latest location for weather

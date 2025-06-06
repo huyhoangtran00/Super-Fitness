@@ -10,3 +10,4 @@ const val CHANNEL_ID = "TRACK_GOOGLE_MAP"
 
 const val GREEN = "#32a852"
 const val RED = "#fc4430"
+const val BLUE = "#1c7eff"

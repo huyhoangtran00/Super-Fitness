@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DailyUnits(
+    @SerialName("rain_sum")
+    val rainSum: String,
     @SerialName("sunrise")
     val sunrise: String,
     @SerialName("sunset")
@@ -23,5 +25,7 @@ data class DailyUnits(
     @SerialName("wind_direction_10m_dominant")
     val windDirection10mDominant: String,
     @SerialName("wind_speed_10m_max")
-    val windSpeed10mMax: String
+    val windSpeed10mMax: String,
+    @SerialName("precipitation_probability_max")
+    val rainProbability: String
 )

@@ -28,8 +28,6 @@ data class ApiWeather(
     val latitude: Double,
     @SerialName("longitude")
     val longitude: Double,
-    @SerialName("timezone")
-    val timezone: String,
     @SerialName("timezone_abbreviation")
     val timezoneAbbreviation: String,
     @SerialName("utc_offset_seconds")

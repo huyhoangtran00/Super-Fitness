@@ -5,49 +5,59 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.superfitness.domain.models.Daily
+import com.example.superfitness.domain.location.LocationManager
+import com.example.superfitness.domain.models.DailyWeather
 import com.example.superfitness.domain.models.Weather
 import com.example.superfitness.domain.repository.WeatherRepository
 import com.example.superfitness.utils.Response
 import com.example.superfitness.utils.WeatherUtils
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class WeatherViewModel(
-    private val repository: WeatherRepository
+    private val repository: WeatherRepository,
+    private val locationManager: LocationManager
 ) : ViewModel() {
 
     var weatherState by mutableStateOf(WeatherUiState())
         private set
-
     init {
+        fetchWeatherFromCurrentLocation()
+    }
+
+    private fun fetchWeatherFromCurrentLocation() {
         viewModelScope.launch {
-            repository.getWeatherData().collect { response ->
-                when (response) {
-                    is Response.Loading -> {
-                        weatherState = weatherState.copy(
-                            isLoading = true
-                        )
-                    }
-
-                    is Response.Success -> {
-                        weatherState = weatherState.copy(
-                            isLoading = false,
-                            error = null,
-                            weather = response.data
-                        )
-                        val todayDailWeatherInfo = response.data?.daily?.weatherInfo?.find {
-                            WeatherUtils.isTodayDate(it.time)
+            // Suspend till first location is emitted
+            locationManager.locationUpdates.firstOrNull()?.let { location ->
+                repository.getWeatherData(
+                    lat = location.latitude,
+                    long = location.longitude
+                ).collect { response ->
+                    when (response) {
+                        is Response.Loading -> {
+                            weatherState = weatherState.copy(isLoading = true)
                         }
-                        weatherState = weatherState.copy(
-                            dailyWeatherInfo = todayDailWeatherInfo
-                        )
-                    }
 
-                    is Response.Error -> {
-                        weatherState = weatherState.copy(
-                            isLoading = false,
-                            error = response.message
-                        )
+                        is Response.Success -> {
+                            val weather = response.data
+                            val todayDailyWeatherInfo = weather?.dailyWeather?.weatherInfo?.find {
+                                WeatherUtils.isTodayDate(WeatherUtils.formatUnixDate("E", it.time))
+                            }
+
+                            weatherState = weatherState.copy(
+                                isLoading = false,
+                                weather = weather,
+                                dailyWeatherWeatherInfo = todayDailyWeatherInfo,
+                                error = null
+                            )
+                        }
+
+                        is Response.Error -> {
+                            weatherState = weatherState.copy(
+                                isLoading = false,
+                                error = response.message
+                            )
+                        }
                     }
                 }
             }
@@ -59,5 +69,5 @@ data class WeatherUiState(
     val weather: Weather? = null,
     val error: String? = null,
     val isLoading: Boolean = false,
-    val dailyWeatherInfo: Daily.WeatherInfo? = null
+    val dailyWeatherWeatherInfo: DailyWeather.WeatherInfo? = null
 )

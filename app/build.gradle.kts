@@ -41,6 +41,9 @@ android {
     buildFeatures {
         compose = true
     }
+
+
+
 }
 
 dependencies {
@@ -58,15 +61,10 @@ dependencies {
     implementation(libs.timber)
 
     // Retrofit + OkHttp
-    // Kotlin Serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-
-// Converter for Retrofit
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
-
-// Retrofit + OkHttp (nếu chưa có)
-    implementation("com.squareup.retrofit2:retrofit:3.0.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.kotlinx)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.okhttp)
 
     // Room
     implementation(libs.room.runtime)
@@ -90,6 +88,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)

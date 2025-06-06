@@ -1,4 +1,4 @@
-package com.example.superfitness.viewmodel
+package com.example.superfitness.data.di
 
 import android.app.Application
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
@@ -8,6 +8,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.superfitness.SuperFitnessApplication
 import com.example.superfitness.ui.screens.weather.WeatherViewModel
+import com.example.superfitness.ui.screens.home.HomeViewModel
+import com.example.superfitness.ui.screens.running_details.RunDetailsViewModel
+import com.example.superfitness.ui.screens.run.RunViewModel
 
 /**
  * Manual dependency injection
@@ -35,7 +38,8 @@ object AppViewModelProvider {
         }
         initializer {
             WeatherViewModel(
-                superFitnessApplication().container.weatherRepository
+                superFitnessApplication().container.weatherRepository,
+                superFitnessApplication().container.locationManager
             )
         }
     }

@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class ApiDailyWeather(
+    @SerialName("rain_sum")
+    val rainSum: List<Double>,
     @SerialName("sunrise")
     val sunrise: List<Int>,
     @SerialName("sunset")
@@ -25,5 +27,7 @@ data class ApiDailyWeather(
     @SerialName("wind_direction_10m_dominant")
     val windDirection10mDominant: List<Double>,
     @SerialName("wind_speed_10m_max")
-    val windSpeed10mMax: List<Double>
+    val windSpeed10mMax: List<Double>,
+    @SerialName("precipitation_probability_max")
+    val rainProbability: List<Int>
 )

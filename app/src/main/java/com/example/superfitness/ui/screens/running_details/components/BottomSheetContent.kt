@@ -1,4 +1,4 @@
-package com.example.superfitness.ui.screens.runningdetails.components
+package com.example.superfitness.ui.screens.running_details.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -20,11 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.superfitness.data.local.db.entity.RunEntity
 import com.example.superfitness.utils.DistanceKmFormatter
-import com.example.superfitness.utils.LocationsUtils
 import com.example.superfitness.utils.TimeUtilFormatter
-import com.example.superfitness.viewmodel.RunDetails
-import com.example.superfitness.viewmodel.toRunEntity
-import java.nio.file.WatchEvent
+import com.example.superfitness.ui.screens.running_details.RunDetails
+import com.example.superfitness.ui.screens.running_details.toRunEntity
 
 @Composable
 fun BottomSheetContent(

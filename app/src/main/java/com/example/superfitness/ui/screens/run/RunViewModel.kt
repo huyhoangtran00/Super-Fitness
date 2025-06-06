@@ -1,11 +1,10 @@
-package com.example.superfitness.viewmodel
+package com.example.superfitness.ui.screens.run
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.superfitness.data.local.db.entity.RunEntity
+import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.domain.repository.RunRepository
-import com.example.superfitness.location.LocationManager
-import com.example.superfitness.ui.screens.run.TrackingService
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +28,7 @@ class RunViewModel(
         .map { location -> LatLng(location.latitude, location.longitude) }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
+            started = SharingStarted.Companion.WhileSubscribed(5000L),
             initialValue = null
         )
 
