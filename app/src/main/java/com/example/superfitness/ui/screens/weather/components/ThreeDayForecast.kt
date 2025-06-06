@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import com.example.superfitness.domain.models.DailyWeather
 import com.example.superfitness.utils.BLUE
+import com.example.superfitness.utils.RED
 import com.example.superfitness.utils.WeatherUtils
 import kotlin.math.roundToInt
 
@@ -93,7 +94,8 @@ fun DailyMaxAndMinTemperatures(
     rain: String
 ) {
     Row(
-        modifier = modifier
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "$max°",
@@ -108,7 +110,7 @@ fun DailyMaxAndMinTemperatures(
                 color = Color.Black
             )
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "$rain%",
             style = MaterialTheme.typography.titleSmall.copy(
