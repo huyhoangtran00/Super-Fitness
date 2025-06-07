@@ -4,9 +4,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.superfitness.data.local.db.dao.UserProfileDao
 import com.example.superfitness.data.local.db.entity.UserProfile
-import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class UserProfileRepository @Inject constructor(private val userProfileDao: UserProfileDao) {
+class UserProfileRepository(private val userProfileDao: UserProfileDao) {
 
     // Lấy tất cả người dùng
     fun getAllUsers(): LiveData<List<UserProfile>>  {
@@ -35,7 +36,14 @@ class UserProfileRepository @Inject constructor(private val userProfileDao: User
 
     // Lấy người dùng theo ID
     suspend fun getUserById(userId: Int): UserProfile? {
-
         return userProfileDao.getUserById(userId)
     }
+
+    // Trả về BMI dưới dạng Float
+    suspend fun getUserBmi(userId: Int): Float? = userProfileDao.getUserBmi(userId)
+
+    // Trả về weight dưới dạng Float
+    suspend fun getUserWeight(userId: Int): Float? = userProfileDao.getUserWeight(userId)
+    fun hasUserProfile(): Flow<Boolean> = userProfileDao.getUserCount().map { it > 0 }
+
 }

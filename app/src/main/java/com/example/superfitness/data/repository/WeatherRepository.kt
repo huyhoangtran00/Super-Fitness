@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-class WeatherRepository @Inject constructor(
+class WeatherRepository (
     private val api: WeatherApi,
     private val dao: WeatherDao,
     private val connectivityManager: ConnectivityManager
@@ -152,7 +152,6 @@ class WeatherRepository @Inject constructor(
     }
 
     private fun isLocationMatch(entity: ForecastWeatherEntity, lat: Double, long: Double): Boolean {
-        // Consider locations within 1 degree as the same (approximately 111 km)
         val latDiff = Math.abs(entity.latitude - lat)
         val longDiff = Math.abs(entity.longitude - long)
         return latDiff < 1.0 && longDiff < 1.0
