@@ -1,10 +1,6 @@
 ﻿# Super-Fitness
- A Fitness app that can track and save your running activity, bicycle activity, trailling, hiking,...
- UI use Jetpack Compose
- The app keeps tracking even when you leave the screen, leave the app, turn off the phone thanks to Service
- Use Room database to save tracks
- Use Google Services location to track the current location
- The additional feature that can forecast the weather show day and night color using Meteo Weather API + Retrofit2 following the Clean Architecture
+ A fitness tracking app that supports running, cycling, trail running, hiking, and more. Built with Jetpack Compose for a modern and responsive UI. The app continues tracking in the background—even when the screen is off, the app is closed, or the device is restarted—by leveraging Android’s foreground service. Location data is collected using Google Location Services and stored with Room for offline access. Includes a weather forecasting feature using the Meteo Weather API and Retrofit2, with day/night theming. Follows Clean Architecture principles. Planned updates include statistics visualization with charts and user account login for multi-device support.
+ 
 ![image](https://github.com/user-attachments/assets/d0daeb0b-af88-420f-855e-42dc7809f3ac)
 ![image](https://github.com/user-attachments/assets/d66e64e5-83e0-4c2a-af86-f764a68ab896)
 ![image](https://github.com/user-attachments/assets/5c5d1279-e1f6-4126-ae2d-bb7ec21faad7)
