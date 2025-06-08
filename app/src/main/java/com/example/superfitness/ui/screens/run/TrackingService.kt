@@ -52,7 +52,7 @@ class TrackingService : Service() {
     private var lastSecondTimestamp = 0L
 
     private var initialSteps = -1L
-
+    private var lastStepSensorValue = -1L
     companion object {
         private const val TAG = "TrackingService"
         var startTime = 0L
@@ -129,6 +129,7 @@ class TrackingService : Service() {
     }
 
     override fun onDestroy() {
+        unregisterStepCounter()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
         super.onDestroy()
@@ -155,6 +156,7 @@ class TrackingService : Service() {
         isTracking = false
         isTimerEnabled = false
         initialSteps = -1L
+        lastStepSensorValue = -1L
 
         locationUiState.update {
             it.copy(
@@ -190,14 +192,18 @@ class TrackingService : Service() {
         override fun onSensorChanged(event: SensorEvent?) {
             if (event == null) return
 
-            event.let {
-                val stepsSinceReboot = event.values[0].toLong()
+            val stepsSinceReboot = event.values[0].toLong()
 
-                if (initialSteps == -1L) {
-                    initialSteps = stepsSinceReboot
-                }
+            if (initialSteps == -1L) {
+                initialSteps = stepsSinceReboot
+                lastStepSensorValue = stepsSinceReboot
+                return
+            }
 
-                steps += stepsSinceReboot - initialSteps
+            if (stepsSinceReboot > lastStepSensorValue) {
+                val stepDelta = stepsSinceReboot - lastStepSensorValue
+                steps += stepDelta
+                lastStepSensorValue = stepsSinceReboot
             }
         }
 
@@ -208,13 +214,15 @@ class TrackingService : Service() {
         if (isTracking) {
             val stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
-            if (stepCounterSensor == null) return
-
-            sensorManager.registerListener(
-                sensorListener,
-                stepCounterSensor,
-                SensorManager.SENSOR_DELAY_UI
-            )
+            if (stepCounterSensor == null) {
+                return
+            } else {
+                sensorManager.registerListener(
+                    sensorListener,
+                    stepCounterSensor,
+                    SensorManager.SENSOR_DELAY_FASTEST
+                )
+            }
         }
     }
 
