@@ -1,5 +1,6 @@
 package com.example.superfitness.ui.screens.weather
 
+import android.location.Geocoder
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -61,7 +62,8 @@ fun WeatherScreen(
                         .padding(top = 32.dp, start = 12.dp, end = 12.dp)
                 ) {
                     ActionBar(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        address = weatherUiState.address ?: "Loading location..."
                     )
                     Spacer(modifier.height(16.dp))
                     Text(
@@ -88,7 +90,7 @@ fun WeatherScreen(
                     Text(
                         text = "Today 24-hour forecast",
                         style = MaterialTheme.typography.titleMedium.copy(
-                            color = Color.Gray,
+                            color = Color.Black,
                             fontWeight = FontWeight.SemiBold
                         )
                     )

@@ -22,11 +22,11 @@ import com.example.superfitness.R
 @Composable
 fun ActionBar(
     modifier: Modifier = Modifier,
-    address: String = "Nam Tu Liem, Hanoi"
+    address: String
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         LocationInfo(
