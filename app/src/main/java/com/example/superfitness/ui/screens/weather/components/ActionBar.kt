@@ -30,7 +30,6 @@ fun ActionBar(
         horizontalArrangement = Arrangement.Center
     ) {
         LocationInfo(
-            modifier = Modifier.padding(top = 8.dp),
             location = address
         )
     }

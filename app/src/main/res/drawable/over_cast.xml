@@ -16,7 +16,7 @@
   </group>
   <!-- Cloud scaled to 1/2 size and moved left by 20 units -->
   <group
-      android:scaleX="1"
+      android:scaleX="0.8"
       android:scaleY="0.8"
       android:translateX="0"
       android:translateY="40">
