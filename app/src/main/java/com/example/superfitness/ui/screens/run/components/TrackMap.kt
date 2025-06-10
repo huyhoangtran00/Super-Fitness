@@ -59,13 +59,15 @@ fun TrackMap(
     }
 
 
-    LaunchedEffect(key1 = currentLocation) {
-        currentLocation?.let {
-            cameraPositionState.animate(
-                CameraUpdateFactory.newCameraPosition(
-                    CameraPosition.fromLatLngZoom(currentLocation, MAP_ZOOM)
+    LaunchedEffect(key1 = currentLocation, key2 = isMapLoaded) {
+        if (isMapLoaded) {
+            currentLocation?.let {
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(currentLocation, MAP_ZOOM)
+                    )
                 )
-            )
+            }
         }
     }
 

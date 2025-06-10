@@ -1,6 +1,5 @@
 package com.example.superfitness.ui.screens.run.components
 
-import android.location.Location
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -10,7 +9,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,14 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.graphics.toColorInt
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.superfitness.R
 import com.example.superfitness.ui.components.LocationPermissionTextProvider
 import com.example.superfitness.ui.components.PermissionDialog
-import com.example.superfitness.utils.DrawableConverter
 import com.example.superfitness.utils.GREEN
 import com.example.superfitness.utils.MAP_ZOOM
 import com.example.superfitness.utils.RED
@@ -43,7 +37,6 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun StartScreenBody(
@@ -61,7 +54,7 @@ fun StartScreenBody(
     val cameraPositionState = rememberCameraPositionState()
 
     var showMessage by rememberSaveable { mutableStateOf(false) }
-    var showMap by rememberSaveable { mutableStateOf(false) }
+    var isMapLoaded by rememberSaveable { mutableStateOf(false) }
 
     val mapUiSettings by remember {
         mutableStateOf(
@@ -82,20 +75,22 @@ fun StartScreenBody(
         }
     }
 
-    LaunchedEffect(currentLocation) {
-        currentLocation?.let {
-            cameraPositionState.animate(
-                update = CameraUpdateFactory.newCameraPosition(
-                    CameraPosition.fromLatLngZoom(currentLocation, MAP_ZOOM)
+    LaunchedEffect(key1 = currentLocation, key2 = isMapLoaded) {
+        if (isMapLoaded) {
+            currentLocation?.let {
+                cameraPositionState.animate(
+                    update = CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(currentLocation, MAP_ZOOM)
+                    )
                 )
-            )
+            }
         }
     }
 
     // Delay map loading to wait for screen animation
     LaunchedEffect(Unit) {
         delay(900L) //
-        showMap = true
+        isMapLoaded = true
     }
 
 
@@ -103,7 +98,7 @@ fun StartScreenBody(
         Box(
             modifier = modifier
         ) {
-            if (showMap) {
+            if (isMapLoaded) {
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     uiSettings = mapUiSettings,

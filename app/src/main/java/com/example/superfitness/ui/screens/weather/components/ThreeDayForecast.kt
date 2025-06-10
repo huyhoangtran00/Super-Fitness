@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,29 +35,31 @@ fun ThreeDayForecast(
     modifier: Modifier = Modifier,
     dailyWeather: DailyWeather
 ) {
-    Column(
-        modifier = Modifier
-            .padding(vertical = 8.dp)
-            .fillMaxWidth()
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(32.dp)
-            ),
+    Surface (
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(32.dp),
+        color = Color.White,
+        shadowElevation = 4.dp
     ) {
-        dailyWeather.weatherInfo.take(3).forEachIndexed { index, item ->
-            DailyForecastItem(
-                dayOfTheWeek = when(index) {
-                    0 -> "Today"
-                    1 -> "Tomorrow"
-                    else -> WeatherUtils.formatUnixDate("EEEE", item.time).take(3) },
-                item = item
-            )
-            if (index != 2) {
-                HorizontalDivider(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            dailyWeather.weatherInfo.take(3).forEachIndexed { index, item ->
+                DailyForecastItem(
+                    dayOfTheWeek = when(index) {
+                        0 -> "Today"
+                        1 -> "Tomorrow"
+                        else -> WeatherUtils.formatUnixDate("EEEE", item.time).take(3) },
+                    item = item
+                )
+                if (index != 2) {
+                    HorizontalDivider(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp))
+                }
             }
         }
+
     }
 }
 
@@ -69,7 +74,7 @@ fun DailyForecastItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Day
@@ -88,7 +93,7 @@ fun DailyForecastItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             WeatherImage(
-                height = 32.dp,
+                height = 24.dp,
                 icon = item.weatherStatus.icon
             )
             Text(

@@ -59,7 +59,7 @@ fun WeatherScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(top = 32.dp, start = 12.dp, end = 12.dp)
+                        .padding(top = 32.dp, start = 8.dp, end = 8.dp)
                 ) {
                     ActionBar(
                         modifier = Modifier.fillMaxWidth(),
@@ -99,7 +99,7 @@ fun WeatherScreen(
                         modifier = Modifier.fillMaxWidth(),
                         hourlyWeather = it.hourlyWeather
                     )
-                    Spacer(modifier.height(8.dp))
+                    Spacer(modifier.height(16.dp))
                     ThreeDayForecast(
                         modifier = Modifier.fillMaxWidth(),
                         dailyWeather = it.dailyWeather,
