@@ -1,9 +1,7 @@
 package com.example.superfitness.domain.repository
 
-import com.example.superfitness.domain.models.Weather
-import com.example.superfitness.utils.Response
-import kotlinx.coroutines.flow.Flow
+import com.example.superfitness.data.remote.models.ApiWeather
 
 interface WeatherRepository {
-    fun getWeatherData(lat: Double, long: Double): Flow<Response<Weather>>
+    suspend fun getWeatherData(lat: Double, long: Double): ApiWeather
 }

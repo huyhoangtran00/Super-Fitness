@@ -1,12 +1,11 @@
-package com.example.superfitness.data.local.db
+package com.example.superfitness.data.local
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.superfitness.data.local.db.dao.RunDao
-import com.example.superfitness.data.local.db.entity.RunEntity
+import com.example.superfitness.data.local.dao.RunDao
+import com.example.superfitness.data.local.entity.RunEntity
 
 @Database(
     entities = [

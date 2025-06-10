@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.superfitness.R
-import com.example.superfitness.data.local.db.entity.RunEntity
+import com.example.superfitness.data.local.entity.RunEntity
 import com.example.superfitness.ui.navigation.NavigationDestination
 import com.example.superfitness.ui.screens.run.components.StartScreenBody
 import com.example.superfitness.ui.screens.run.components.StartScreenBottomBar
@@ -34,7 +34,6 @@ import com.example.superfitness.ui.screens.run.components.TrackScreenBottomBar
 import com.example.superfitness.ui.screens.run.components.TrackScreenTopBar
 import com.example.superfitness.utils.LocationsUtils
 import com.example.superfitness.data.di.AppViewModelProvider
-import com.example.superfitness.ui.screens.run.RunViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState

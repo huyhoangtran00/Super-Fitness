@@ -1,11 +1,11 @@
-package com.example.superfitness.data.local.db.dao
+package com.example.superfitness.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.superfitness.data.local.db.entity.RunEntity
+import com.example.superfitness.data.local.entity.RunEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

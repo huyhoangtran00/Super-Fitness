@@ -5,8 +5,8 @@ import android.content.Context.SENSOR_SERVICE
 import android.hardware.SensorManager
 import com.example.superfitness.data.connectivity.AndroidConnectivityObserver
 import com.example.superfitness.data.connectivity.ConnectivityObserver
-import com.example.superfitness.data.local.db.AppDatabase
-import com.example.superfitness.data.location.GeocoderImpl
+import com.example.superfitness.data.local.AppDatabase
+import com.example.superfitness.data.location.GeocoderHelperImpl
 import com.example.superfitness.data.mapper_impl.ApiDailyMapper
 import com.example.superfitness.data.mapper_impl.ApiHourlyMapper
 import com.example.superfitness.data.mapper_impl.ApiWeatherMapper
@@ -19,6 +19,7 @@ import com.example.superfitness.domain.location.GeocoderHelper
 import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.domain.repository.RunRepository
 import com.example.superfitness.domain.repository.WeatherRepository
+import com.example.superfitness.domain.usecases.get_weather.GetWeatherUseCase
 import com.example.superfitness.utils.K
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -33,6 +34,7 @@ interface AppContainer {
     val sensorManager: SensorManager
     val weatherRepository: WeatherRepository
     val geocoderHelper: GeocoderHelper
+    val getUserUseCase: GetWeatherUseCase
 }
 
 class DefaultAppContainer(
@@ -77,18 +79,22 @@ class DefaultAppContainer(
     }
 
     override val weatherRepository: WeatherRepository by lazy {
-        val apiWeatherMapper = ApiWeatherMapper(
-            apiDailyWeatherMapper = ApiDailyMapper(),
-            apiHourlyWeatherMapper = ApiHourlyMapper(),
-            apiCurrentWeatherMapper = ApiCurrentWeatherMapper()
-        )
-
         WeatherRepositoryImpl(
-            weatherApi = retrofitServiceWeatherApi,
-            apiWeatherMapper = apiWeatherMapper
+            weatherApi = retrofitServiceWeatherApi
         )
     }
+
+    override val getUserUseCase: GetWeatherUseCase =
+        GetWeatherUseCase(
+            repository = weatherRepository,
+            apiWeatherMapper =  ApiWeatherMapper(
+                apiDailyWeatherMapper = ApiDailyMapper(),
+                apiHourlyWeatherMapper = ApiHourlyMapper(),
+                apiCurrentWeatherMapper = ApiCurrentWeatherMapper()
+            )
+        )
+
     override val geocoderHelper: GeocoderHelper by lazy {
-        GeocoderImpl(context)
+        GeocoderHelperImpl(context)
     }
 }

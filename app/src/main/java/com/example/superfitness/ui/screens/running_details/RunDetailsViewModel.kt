@@ -3,7 +3,7 @@ package com.example.superfitness.ui.screens.running_details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.superfitness.data.local.db.entity.RunEntity
+import com.example.superfitness.data.local.entity.RunEntity
 import com.example.superfitness.domain.repository.RunRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

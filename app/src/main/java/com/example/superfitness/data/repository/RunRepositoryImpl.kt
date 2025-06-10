@@ -1,7 +1,7 @@
 package com.example.superfitness.data.repository
 
-import com.example.superfitness.data.local.db.dao.RunDao
-import com.example.superfitness.data.local.db.entity.RunEntity
+import com.example.superfitness.data.local.dao.RunDao
+import com.example.superfitness.data.local.entity.RunEntity
 import com.example.superfitness.domain.repository.RunRepository
 import kotlinx.coroutines.flow.Flow
 class OfflineRunRepository(

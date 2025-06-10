@@ -10,13 +10,14 @@ import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.domain.models.DailyWeather
 import com.example.superfitness.domain.models.Weather
 import com.example.superfitness.domain.repository.WeatherRepository
+import com.example.superfitness.domain.usecases.get_weather.GetWeatherUseCase
 import com.example.superfitness.utils.Response
 import com.example.superfitness.utils.WeatherUtils
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class WeatherViewModel(
-    private val repository: WeatherRepository,
+    private val getWeatherUseCase: GetWeatherUseCase,
     private val locationManager: LocationManager,
     private val geocoderHelper: GeocoderHelper,
 ) : ViewModel() {
@@ -32,7 +33,7 @@ class WeatherViewModel(
             // Suspend till first location is emitted
             locationManager.locationUpdates.firstOrNull()?.let { location ->
                 val address = geocoderHelper.getAddressFromLocation(location.latitude, location.longitude)
-                repository.getWeatherData(
+                getWeatherUseCase(
                     lat = location.latitude,
                     long = location.longitude
                 ).collect { response ->

@@ -38,7 +38,7 @@ object AppViewModelProvider {
         }
         initializer {
             WeatherViewModel(
-                superFitnessApplication().container.weatherRepository,
+                superFitnessApplication().container.getUserUseCase,
                 superFitnessApplication().container.locationManager,
                 superFitnessApplication().container.geocoderHelper
             )

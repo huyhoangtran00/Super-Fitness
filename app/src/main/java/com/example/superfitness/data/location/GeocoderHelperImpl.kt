@@ -1,7 +1,6 @@
 package com.example.superfitness.data.location
 
 import android.content.Context
-import android.location.Address
 import android.location.Geocoder
 import android.os.Build
 import com.example.superfitness.domain.location.GeocoderHelper
@@ -11,7 +10,7 @@ import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class GeocoderImpl(
+class GeocoderHelperImpl(
     private val context: Context
 ) : GeocoderHelper {
     override suspend fun getAddressFromLocation(
@@ -34,6 +33,7 @@ class GeocoderImpl(
                     removeCountryString(addresses?.firstOrNull()?.getAddressLine(0))
                 }
             } catch (e: Exception) {
+                // If lat or long is invalid
                 null
             }
         }

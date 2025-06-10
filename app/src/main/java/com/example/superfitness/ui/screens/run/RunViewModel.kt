@@ -2,7 +2,7 @@ package com.example.superfitness.ui.screens.run
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.superfitness.data.local.db.entity.RunEntity
+import com.example.superfitness.data.local.entity.RunEntity
 import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.domain.repository.RunRepository
 import com.google.android.gms.maps.model.LatLng
