@@ -40,7 +40,8 @@ object AppViewModelProvider {
             WeatherViewModel(
                 superFitnessApplication().container.getUserUseCase,
                 superFitnessApplication().container.locationManager,
-                superFitnessApplication().container.geocoderHelper
+                superFitnessApplication().container.geocoderHelper,
+                superFitnessApplication().container.connectivityObserver
             )
         }
     }

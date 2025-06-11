@@ -6,6 +6,7 @@ import android.os.Build
 import com.example.superfitness.domain.location.GeocoderHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -21,10 +22,12 @@ class GeocoderHelperImpl(
             try {
                 val geocoder = Geocoder(context, Locale.getDefault())
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    suspendCoroutine { continuation ->
-                        geocoder.getFromLocation(latitude, longitude, 1) { addresses ->
-                            val addressLine = removeCountryString(addresses.firstOrNull()?.getAddressLine(0))
-                            continuation.resume(addressLine)
+                    withTimeoutOrNull(3000L) {
+                        suspendCoroutine { continuation ->
+                            geocoder.getFromLocation(latitude, longitude, 1) { addresses ->
+                                val addressLine = removeCountryString(addresses.firstOrNull()?.getAddressLine(0))
+                                continuation.resume(addressLine)
+                            }
                         }
                     }
                 } else {

@@ -6,22 +6,26 @@ import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import androidx.core.content.getSystemService
+import com.example.superfitness.domain.connectivity.ConnectivityObserver
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
-interface ConnectivityObserver {
-    val isConnected: Flow<Boolean>
-}
-
-class AndroidConnectivityObserver(
+class ConnectivityObserverImpl(
     private val context: Context
 ): ConnectivityObserver {
 
     private val connectivityManager = context.getSystemService<ConnectivityManager>()!!
-
     override val isConnected: Flow<Boolean>
         get() = callbackFlow {
+            val currentNetwork = connectivityManager.activeNetwork
+            val currentNetworkCapabilities = connectivityManager
+                .getNetworkCapabilities(currentNetwork)
+            val isCurrentlyConnected = currentNetworkCapabilities
+                ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+            trySend(isCurrentlyConnected)
+
             val callback = object : NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
@@ -55,5 +59,5 @@ class AndroidConnectivityObserver(
             awaitClose{
                 connectivityManager.unregisterNetworkCallback(callback)
             }
-        }
+        }.distinctUntilChanged() // Avoid duplicated emit
 }

@@ -3,8 +3,7 @@ package com.example.superfitness.data.di
 import android.content.Context
 import android.content.Context.SENSOR_SERVICE
 import android.hardware.SensorManager
-import com.example.superfitness.data.connectivity.AndroidConnectivityObserver
-import com.example.superfitness.data.connectivity.ConnectivityObserver
+import com.example.superfitness.data.connectivity.ConnectivityObserverImpl
 import com.example.superfitness.data.local.AppDatabase
 import com.example.superfitness.data.location.GeocoderHelperImpl
 import com.example.superfitness.data.mapper_impl.ApiDailyMapper
@@ -15,6 +14,7 @@ import com.example.superfitness.data.remote.WeatherApi
 import com.example.superfitness.data.location.LocationManagerImpl
 import com.example.superfitness.data.repository.OfflineRunRepository
 import com.example.superfitness.data.repository.WeatherRepositoryImpl
+import com.example.superfitness.domain.connectivity.ConnectivityObserver
 import com.example.superfitness.domain.location.GeocoderHelper
 import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.domain.repository.RunRepository
@@ -30,10 +30,10 @@ import retrofit2.Retrofit
 interface AppContainer {
     val connectivityObserver: ConnectivityObserver
     val locationManager: LocationManager
-    val runRepository: RunRepository
-    val sensorManager: SensorManager
-    val weatherRepository: WeatherRepository
     val geocoderHelper: GeocoderHelper
+    val sensorManager: SensorManager
+    val runRepository: RunRepository
+    val weatherRepository: WeatherRepository
     val getUserUseCase: GetWeatherUseCase
 }
 
@@ -57,7 +57,7 @@ class DefaultAppContainer(
     }
 
     override val connectivityObserver: ConnectivityObserver by lazy {
-        AndroidConnectivityObserver(context)
+        ConnectivityObserverImpl(context)
     }
 
     override val locationManager: LocationManager by lazy {

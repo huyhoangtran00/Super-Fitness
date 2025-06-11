@@ -6,8 +6,8 @@ import com.example.superfitness.domain.repository.WeatherRepository
 import com.example.superfitness.utils.Response
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
 import java.io.IOException
-
 class GetWeatherUseCase(
     private val repository: WeatherRepository,
     private val apiWeatherMapper: ApiWeatherMapper
@@ -20,7 +20,10 @@ class GetWeatherUseCase(
             emit(Response.Success<Weather>(weather))
         } catch(e: IOException) {
             e.printStackTrace()
-            emit(Response.Error(e.message.orEmpty()))
+            emit(Response.Error("Check Internet Connection"))
+        } catch(e: HttpException) {
+            e.printStackTrace()
+            emit(Response.Error("Http error"))
         }
     }
 }

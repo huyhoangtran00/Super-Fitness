@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.example.superfitness.R
 
 @Composable
-fun MoreCurrentWeatherData(
+fun AdditionalWeatherData(
     modifier: Modifier = Modifier,
     uvIndex: String,
     humidity: String,

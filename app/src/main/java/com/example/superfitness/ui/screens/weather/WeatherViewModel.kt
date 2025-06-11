@@ -5,34 +5,61 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.superfitness.domain.connectivity.ConnectivityObserver
 import com.example.superfitness.domain.location.GeocoderHelper
 import com.example.superfitness.domain.location.LocationManager
-import com.example.superfitness.domain.models.DailyWeather
 import com.example.superfitness.domain.models.Weather
-import com.example.superfitness.domain.repository.WeatherRepository
 import com.example.superfitness.domain.usecases.get_weather.GetWeatherUseCase
 import com.example.superfitness.utils.Response
-import com.example.superfitness.utils.WeatherUtils
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 class WeatherViewModel(
     private val getWeatherUseCase: GetWeatherUseCase,
     private val locationManager: LocationManager,
     private val geocoderHelper: GeocoderHelper,
+    private val connectivityObserver: ConnectivityObserver
 ) : ViewModel() {
 
     var weatherState by mutableStateOf(WeatherUiState())
         private set
+
     init {
         fetchWeatherFromCurrentLocation()
     }
 
-    private fun fetchWeatherFromCurrentLocation() {
+    fun fetchWeatherFromCurrentLocation() {
         viewModelScope.launch {
-            // Suspend till first location is emitted
-            locationManager.locationUpdates.firstOrNull()?.let { location ->
+            // Every time fetching, show loading circular
+            weatherState = weatherState.copy(
+                isLoading = true
+            )
+
+            // Check Internet Connectivity
+            if (!connectivityObserver.isConnected.first()) {
+                weatherState = weatherState.copy(
+                    isLoading = false,
+                    error = "Check Internet connection"
+                )
+                return@launch
+            }
+
+            // Check Gps
+            val location = withTimeoutOrNull(3000) {
+                locationManager.locationUpdates.firstOrNull()
+            }
+
+            if (location == null) {
+                weatherState = weatherState.copy(
+                    isLoading = false,
+                    error = "Unable to fetch location\nPlease check GPS settings"
+                )
+                return@launch
+            } else {
                 val address = geocoderHelper.getAddressFromLocation(location.latitude, location.longitude)
+
                 getWeatherUseCase(
                     lat = location.latitude,
                     long = location.longitude
@@ -44,14 +71,10 @@ class WeatherViewModel(
 
                         is Response.Success -> {
                             val weather = response.data
-                            val todayDailyWeatherInfo = weather?.dailyWeather?.weatherInfo?.find {
-                                WeatherUtils.isTodayDate(WeatherUtils.formatUnixDate("E", it.time))
-                            }
 
                             weatherState = weatherState.copy(
                                 isLoading = false,
                                 weather = weather,
-                                dailyWeatherWeatherInfo = todayDailyWeatherInfo,
                                 address = address,
                                 error = null
                             )
@@ -73,7 +96,6 @@ class WeatherViewModel(
 data class WeatherUiState(
     val weather: Weather? = null,
     val error: String? = null,
-    val isLoading: Boolean = false,
-    val dailyWeatherWeatherInfo: DailyWeather.WeatherInfo? = null,
+    val isLoading: Boolean = true,
     val address: String? = null
 )
