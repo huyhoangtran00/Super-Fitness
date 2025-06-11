@@ -27,7 +27,10 @@ class WeatherViewModel(
         private set
 
     init {
-        fetchWeatherFromCurrentLocation()
+        // Ensure the weather only fetched once
+        if (!weatherState.hasLoaded) {
+            fetchWeatherFromCurrentLocation()
+        }
     }
 
     fun fetchWeatherFromCurrentLocation() {
@@ -74,6 +77,7 @@ class WeatherViewModel(
 
                             weatherState = weatherState.copy(
                                 isLoading = false,
+                                hasLoaded = true,
                                 weather = weather,
                                 address = address,
                                 error = null
@@ -96,6 +100,7 @@ class WeatherViewModel(
 data class WeatherUiState(
     val weather: Weather? = null,
     val error: String? = null,
-    val isLoading: Boolean = true,
-    val address: String? = null
+    val address: String? = null,
+    val isLoading: Boolean = false,
+    val hasLoaded: Boolean = false
 )
