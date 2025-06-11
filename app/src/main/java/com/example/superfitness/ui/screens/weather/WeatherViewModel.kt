@@ -27,10 +27,7 @@ class WeatherViewModel(
         private set
 
     init {
-        // Ensure the weather only fetched once
-        if (!weatherState.hasLoaded) {
-            fetchWeatherFromCurrentLocation()
-        }
+        fetchWeatherFromCurrentLocation()
     }
 
     fun fetchWeatherFromCurrentLocation() {
