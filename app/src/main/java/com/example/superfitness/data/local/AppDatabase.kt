@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.superfitness.data.local.dao.RunDao
-import com.example.superfitness.data.local.entity.RunEntity
+import com.example.superfitness.domain.models.entity.RunEntity
 
 @Database(
     entities = [

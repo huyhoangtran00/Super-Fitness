@@ -9,7 +9,7 @@ import com.example.superfitness.domain.connectivity.ConnectivityObserver
 import com.example.superfitness.domain.location.GeocoderHelper
 import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.domain.models.Weather
-import com.example.superfitness.domain.usecases.get_weather.GetWeatherUseCase
+import com.example.superfitness.domain.usecases.weather.GetWeatherUseCase
 import com.example.superfitness.utils.Response
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -74,7 +74,6 @@ class WeatherViewModel(
 
                             weatherState = weatherState.copy(
                                 isLoading = false,
-                                hasLoaded = true,
                                 weather = weather,
                                 address = address,
                                 error = null
@@ -98,6 +97,5 @@ data class WeatherUiState(
     val weather: Weather? = null,
     val error: String? = null,
     val address: String? = null,
-    val isLoading: Boolean = false,
-    val hasLoaded: Boolean = false
+    val isLoading: Boolean = false
 )

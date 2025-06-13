@@ -1,6 +1,6 @@
 package com.example.superfitness.domain.repository
 
-import com.example.superfitness.data.local.entity.RunEntity
+import com.example.superfitness.domain.models.entity.RunEntity
 import kotlinx.coroutines.flow.Flow
 
 interface RunRepository {

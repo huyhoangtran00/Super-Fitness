@@ -1,4 +1,4 @@
-package com.example.superfitness.domain.usecases.get_weather
+package com.example.superfitness.domain.usecases.weather
 
 import com.example.superfitness.data.mapper_impl.ApiWeatherMapper
 import com.example.superfitness.domain.models.Weather

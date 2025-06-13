@@ -5,13 +5,13 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.superfitness.data.local.entity.RunEntity
+import com.example.superfitness.domain.models.entity.RunEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RunDao {
 
-    @Query("SELECT * FROM run_activities")
+    @Query("SELECT * FROM run_activities ORDER BY id DESC")
     fun getAllRuns(): Flow<List<RunEntity>>
 
     @Query("SELECT * FROM run_activities WHERE id = :id")

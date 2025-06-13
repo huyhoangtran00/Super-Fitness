@@ -3,8 +3,9 @@ package com.example.superfitness.ui.screens.running_details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.superfitness.data.local.entity.RunEntity
+import com.example.superfitness.domain.models.entity.RunEntity
 import com.example.superfitness.domain.repository.RunRepository
+import com.example.superfitness.domain.usecases.run.RunUseCases
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -14,13 +15,13 @@ import kotlinx.coroutines.launch
 
 class RunDetailsViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val runRepository: RunRepository
+    private val runUseCases: RunUseCases
 ) : ViewModel() {
 
     val runItemId = checkNotNull(savedStateHandle.get<Int>(RunDetailsDestination.runItemIdArg))
 
     val runItem: StateFlow<RunDetails> =
-        runRepository.getRunStream(runItemId)
+        runUseCases.getRun(runItemId)
             .filterNotNull()
             .map {
                 it.toRunDetails()
@@ -36,7 +37,7 @@ class RunDetailsViewModel(
      */
     fun deleteRun(runEntity: RunEntity) {
         viewModelScope.launch {
-            runRepository.removeRun(runEntity)
+            runUseCases.deleteRun(runEntity)
         }
     }
 }

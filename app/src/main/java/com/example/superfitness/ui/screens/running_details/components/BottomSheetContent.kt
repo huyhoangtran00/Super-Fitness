@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.superfitness.data.local.entity.RunEntity
+import com.example.superfitness.domain.models.entity.RunEntity
 import com.example.superfitness.utils.DistanceKmFormatter
 import com.example.superfitness.utils.TimeUtilFormatter
 import com.example.superfitness.ui.screens.running_details.RunDetails

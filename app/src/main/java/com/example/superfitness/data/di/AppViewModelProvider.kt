@@ -21,24 +21,24 @@ object AppViewModelProvider {
         initializer {
             RunViewModel(
                 superFitnessApplication().container.locationManager,
-                superFitnessApplication().container.runRepository
+                superFitnessApplication().container.runUseCase
             )
         }
 
         initializer {
             HomeViewModel(
-                superFitnessApplication().container.runRepository
+                superFitnessApplication().container.runUseCase
             )
         }
         initializer {
             RunDetailsViewModel(
                 this.createSavedStateHandle(),
-                superFitnessApplication().container.runRepository
+                superFitnessApplication().container.runUseCase
             )
         }
         initializer {
             WeatherViewModel(
-                superFitnessApplication().container.getUserUseCase,
+                superFitnessApplication().container.getWeatherUseCase,
                 superFitnessApplication().container.locationManager,
                 superFitnessApplication().container.geocoderHelper,
                 superFitnessApplication().container.connectivityObserver

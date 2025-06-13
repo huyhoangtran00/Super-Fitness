@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.superfitness.R
-import com.example.superfitness.data.local.entity.RunEntity
+import com.example.superfitness.domain.models.entity.RunEntity
 import com.example.superfitness.ui.navigation.NavigationDestination
 import com.example.superfitness.ui.screens.run.components.StartScreenBody
 import com.example.superfitness.ui.screens.run.components.StartScreenBottomBar

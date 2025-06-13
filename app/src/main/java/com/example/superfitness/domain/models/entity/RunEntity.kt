@@ -1,4 +1,4 @@
-package com.example.superfitness.data.local.entity
+package com.example.superfitness.domain.models.entity
 
 import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.room.Entity

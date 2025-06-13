@@ -19,7 +19,12 @@ import com.example.superfitness.domain.location.GeocoderHelper
 import com.example.superfitness.domain.location.LocationManager
 import com.example.superfitness.domain.repository.RunRepository
 import com.example.superfitness.domain.repository.WeatherRepository
-import com.example.superfitness.domain.usecases.get_weather.GetWeatherUseCase
+import com.example.superfitness.domain.usecases.run.AddRun
+import com.example.superfitness.domain.usecases.run.DeleteRun
+import com.example.superfitness.domain.usecases.run.GetAllRuns
+import com.example.superfitness.domain.usecases.run.GetRun
+import com.example.superfitness.domain.usecases.run.RunUseCases
+import com.example.superfitness.domain.usecases.weather.GetWeatherUseCase
 import com.example.superfitness.utils.K
 import com.google.android.gms.location.LocationServices
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -34,7 +39,8 @@ interface AppContainer {
     val sensorManager: SensorManager
     val runRepository: RunRepository
     val weatherRepository: WeatherRepository
-    val getUserUseCase: GetWeatherUseCase
+    val getWeatherUseCase: GetWeatherUseCase
+    val runUseCase: RunUseCases
 }
 
 class DefaultAppContainer(
@@ -60,16 +66,23 @@ class DefaultAppContainer(
         ConnectivityObserverImpl(context)
     }
 
+    // Location
     override val locationManager: LocationManager by lazy {
         LocationManagerImpl(
             context,
             LocationServices.getFusedLocationProviderClient(context)
         )
     }
+    override val geocoderHelper: GeocoderHelper by lazy {
+        GeocoderHelperImpl(context)
+    }
+
+    // Sensor
     override val sensorManager: SensorManager by lazy {
         context.getSystemService(SENSOR_SERVICE) as SensorManager
     }
 
+    // Repository
     override val runRepository: RunRepository by lazy {
         val database = AppDatabase.getDatabase(context)
 
@@ -84,7 +97,8 @@ class DefaultAppContainer(
         )
     }
 
-    override val getUserUseCase: GetWeatherUseCase =
+    // Use Cases
+    override val getWeatherUseCase: GetWeatherUseCase =
         GetWeatherUseCase(
             repository = weatherRepository,
             apiWeatherMapper =  ApiWeatherMapper(
@@ -94,7 +108,13 @@ class DefaultAppContainer(
             )
         )
 
-    override val geocoderHelper: GeocoderHelper by lazy {
-        GeocoderHelperImpl(context)
-    }
+    override val runUseCase: RunUseCases =
+        RunUseCases(
+            getAllRuns = GetAllRuns(runRepository),
+            getRun = GetRun(runRepository),
+            deleteRun = DeleteRun(runRepository),
+            addRun = AddRun(runRepository)
+        )
+
+
 }
