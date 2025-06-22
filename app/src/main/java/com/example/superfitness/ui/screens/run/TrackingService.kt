@@ -150,9 +150,11 @@ class TrackingService : Service() {
 
                 if (initialSteps == -1L) {
                     initialSteps = stepsSinceReboot
+                    totalSteps = 0L // every start initialize total Steps to 0
+                } else {
+                    totalSteps = stepsSinceReboot - initialSteps
                 }
 
-                totalSteps += stepsSinceReboot - initialSteps
                 // Update steps
                 _locationUiState.update { it.copy(steps = totalSteps) }
             }
