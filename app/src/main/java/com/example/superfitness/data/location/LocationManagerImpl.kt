@@ -53,7 +53,7 @@ class LocationManagerImpl(
                 trySend(false) // Handle permission issues
             }
 
-            // Stop updates when Flow is closed
+            // Stop updates when Flow is closed, avoid memory leaking
             awaitClose { fusedLocationClient.removeLocationUpdates(availabilityCallback) }
         }
     override val locationUpdates: Flow<Location>

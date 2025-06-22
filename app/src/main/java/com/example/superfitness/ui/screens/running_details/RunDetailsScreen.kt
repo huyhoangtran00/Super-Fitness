@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -122,7 +123,7 @@ fun DetailsTrackMap(
     pathPoints: List<LatLng>,
     bottomScaffoldState: BottomSheetScaffoldState
 ) {
-    var isMapLoaded by remember { mutableStateOf(false) }
+    var isMapLoaded by rememberSaveable { mutableStateOf(false) }
     val cameraPositionState = rememberCameraPositionState()
 
     val mapUiSettings by remember {
@@ -135,7 +136,7 @@ fun DetailsTrackMap(
     }
 
     if (pathPoints.size > 1) {
-        val bounds = remember {
+        val bounds = rememberSaveable {
             LatLngBounds.builder().apply {
                 for(point in pathPoints) {
                     this.include(point)

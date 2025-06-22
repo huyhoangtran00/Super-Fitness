@@ -68,7 +68,7 @@ fun RunScreen(
     val locationUiState by viewModel.locationUiState.collectAsStateWithLifecycle()
     val isFirstRun = locationUiState.isFirstRun
 
-    val showTrackingScreen = remember { mutableStateOf(false) }
+    val showTrackingScreen = rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         delay(400L) // Delay to ensure transition completes
@@ -233,9 +233,10 @@ private fun performTrackingService(
     context: Context,
     actions: Actions
 ) {
+    // Create an Explicit Intent with explicit service you want to interact
     Intent(context, TrackingService::class.java).also {
         it.action = actions.name
-        context.startService(it)
+        context.startService(it) // Send intent to start that specific action in service
     }
 }
 

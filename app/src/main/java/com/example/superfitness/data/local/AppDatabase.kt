@@ -15,7 +15,7 @@ import com.example.superfitness.domain.models.entity.RunEntity
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun runDao(): RunDao
+    abstract fun runDao(): RunDao // use to call database.runDao() which returns an instance of DAO
 
     companion object {
         @Volatile

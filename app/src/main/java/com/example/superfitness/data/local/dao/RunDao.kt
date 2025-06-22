@@ -8,6 +8,9 @@ import androidx.room.Query
 import com.example.superfitness.domain.models.entity.RunEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * What to do not How to do
+ */
 @Dao
 interface RunDao {
 

@@ -53,15 +53,28 @@ class DefaultAppContainer(
         ignoreUnknownKeys = true
     }
 
+    /**
+     * Retrofit instance that has base URI (host)
+     * and converter factory to build a web Service API
+      */
     private val retrofit = Retrofit.Builder()
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-        .baseUrl(K.API_BASE_URL)
+        .baseUrl(K.API_BASE_URL) // Host URL
         .build()
 
+    // LAZY INITIALIZATION
+    // DefaultAppContainer is created right after Application is onCreate()
+    // Lazy is used to purposely delay, until you actually need that object,
+    // to avoid unnecessary computation or use of other computing resources
+
+    /**
+     * Create an implementation of the Weather APi endpoint defined by the parameter interface
+     */
     private val retrofitServiceWeatherApi: WeatherApi by lazy {
         retrofit.create(WeatherApi::class.java)
     }
 
+    // Internet Accessibility
     override val connectivityObserver: ConnectivityObserver by lazy {
         ConnectivityObserverImpl(context)
     }
@@ -73,6 +86,7 @@ class DefaultAppContainer(
             LocationServices.getFusedLocationProviderClient(context)
         )
     }
+
     override val geocoderHelper: GeocoderHelper by lazy {
         GeocoderHelperImpl(context)
     }
