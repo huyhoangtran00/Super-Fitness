@@ -135,7 +135,7 @@ class TrackingService : Service() {
                 // Reset for next lap calculation
                 startedTime = System.currentTimeMillis()
 
-                delay(50L)
+                delay(500L) // Less frequent update
             }
 
         }
