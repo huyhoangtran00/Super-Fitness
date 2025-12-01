@@ -6,12 +6,12 @@ import android.hardware.SensorManager
 import com.example.superfitness.data.connectivity.ConnectivityObserverImpl
 import com.example.superfitness.data.local.AppDatabase
 import com.example.superfitness.data.location.GeocoderHelperImpl
+import com.example.superfitness.data.location.LocationManagerImpl
+import com.example.superfitness.data.mapper_impl.ApiCurrentWeatherMapper
 import com.example.superfitness.data.mapper_impl.ApiDailyMapper
 import com.example.superfitness.data.mapper_impl.ApiHourlyMapper
 import com.example.superfitness.data.mapper_impl.ApiWeatherMapper
-import com.example.superfitness.data.mapper_impl.ApiCurrentWeatherMapper
 import com.example.superfitness.data.remote.WeatherApi
-import com.example.superfitness.data.location.LocationManagerImpl
 import com.example.superfitness.data.repository.OfflineRunRepository
 import com.example.superfitness.data.repository.WeatherRepositoryImpl
 import com.example.superfitness.domain.connectivity.ConnectivityObserver
@@ -43,9 +43,7 @@ interface AppContainer {
     val runUseCase: RunUseCases
 }
 
-class DefaultAppContainer(
-    private val context: Context
-) : AppContainer {
+class DefaultAppContainer(private val context: Context) : AppContainer {
 
     // Base Url + Api Service
     private val json = Json {
@@ -54,41 +52,48 @@ class DefaultAppContainer(
     }
 
     /**
-     * Retrofit instance that has base URI (host)
-     * and converter factory to build a web Service API
-      */
-    private val retrofit = Retrofit.Builder()
-        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-        .baseUrl(K.API_BASE_URL) // Host URL
-        .build()
+     * Retrofit instance that has base URI (host) and converter factory to build a web Service API
+     */
+    private val retrofit =
+            Retrofit.Builder()
+                    .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+                    .baseUrl(K.API_BASE_URL) // Host URL
+                    .build()
 
     // LAZY INITIALIZATION
     // DefaultAppContainer is created right after Application is onCreate()
     // Lazy is used to purposely delay, until you actually need that object,
     // to avoid unnecessary computation or use of other computing resources
 
-    /**
-     * Create an implementation of the Weather APi endpoint defined by the parameter interface
-     */
+    /** Create an implementation of the Weather APi endpoint defined by the parameter interface */
     private val retrofitServiceWeatherApi: WeatherApi by lazy {
         retrofit.create(WeatherApi::class.java)
     }
 
     // Internet Accessibility
     override val connectivityObserver: ConnectivityObserver by lazy {
-        ConnectivityObserverImpl(context)
+        ConnectivityObserverImpl(
+                context,
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as
+                        android.net.ConnectivityManager
+        )
     }
 
     // Location
     override val locationManager: LocationManager by lazy {
         LocationManagerImpl(
-            context,
-            LocationServices.getFusedLocationProviderClient(context)
+                context,
+                LocationServices.getFusedLocationProviderClient(context),
+                com.example.superfitness.utils.PermissionCheckerImpl(context)
         )
     }
 
     override val geocoderHelper: GeocoderHelper by lazy {
-        GeocoderHelperImpl(context)
+        GeocoderHelperImpl(
+                com.example.superfitness.data.location.GeocoderWrapperImpl(
+                        android.location.Geocoder(context, java.util.Locale.getDefault())
+                )
+        )
     }
 
     // Sensor
@@ -100,35 +105,30 @@ class DefaultAppContainer(
     override val runRepository: RunRepository by lazy {
         val database = AppDatabase.getDatabase(context)
 
-        OfflineRunRepository(
-            database.runDao()
-        )
+        OfflineRunRepository(database.runDao())
     }
 
     override val weatherRepository: WeatherRepository by lazy {
-        WeatherRepositoryImpl(
-            weatherApi = retrofitServiceWeatherApi
-        )
+        WeatherRepositoryImpl(weatherApi = retrofitServiceWeatherApi)
     }
 
     // Use Cases
     override val getWeatherUseCase: GetWeatherUseCase =
-        GetWeatherUseCase(
-            repository = weatherRepository,
-            apiWeatherMapper =  ApiWeatherMapper(
-                apiDailyWeatherMapper = ApiDailyMapper(),
-                apiHourlyWeatherMapper = ApiHourlyMapper(),
-                apiCurrentWeatherMapper = ApiCurrentWeatherMapper()
+            GetWeatherUseCase(
+                    repository = weatherRepository,
+                    apiWeatherMapper =
+                            ApiWeatherMapper(
+                                    apiDailyWeatherMapper = ApiDailyMapper(),
+                                    apiHourlyWeatherMapper = ApiHourlyMapper(),
+                                    apiCurrentWeatherMapper = ApiCurrentWeatherMapper()
+                            )
             )
-        )
 
     override val runUseCase: RunUseCases =
-        RunUseCases(
-            getAllRuns = GetAllRuns(runRepository),
-            getRun = GetRun(runRepository),
-            deleteRun = DeleteRun(runRepository),
-            addRun = AddRun(runRepository)
-        )
-
-
+            RunUseCases(
+                    getAllRuns = GetAllRuns(runRepository),
+                    getRun = GetRun(runRepository),
+                    deleteRun = DeleteRun(runRepository),
+                    addRun = AddRun(runRepository)
+            )
 }

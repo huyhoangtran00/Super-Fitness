@@ -1,38 +1,32 @@
 package com.example.superfitness.data.location
 
-import android.content.Context
-import android.location.Geocoder
 import android.os.Build
 import com.example.superfitness.domain.location.GeocoderHelper
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import java.util.Locale
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
-class GeocoderHelperImpl(
-    private val context: Context
-) : GeocoderHelper {
-    override suspend fun getAddressFromLocation(
-        latitude: Double,
-        longitude: Double
-    ): String? {
+class GeocoderHelperImpl(private val geocoderWrapper: GeocoderWrapper) : GeocoderHelper {
+    override suspend fun getAddressFromLocation(latitude: Double, longitude: Double): String? {
         return withContext(Dispatchers.IO) {
             try {
-                val geocoder = Geocoder(context, Locale.getDefault())
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     withTimeoutOrNull(3000L) {
                         suspendCoroutine { continuation ->
-                            geocoder.getFromLocation(latitude, longitude, 1) { addresses ->
-                                val addressLine = removeCountryString(addresses.firstOrNull()?.getAddressLine(0))
+                            geocoderWrapper.getFromLocation(latitude, longitude, 1) { addresses ->
+                                val addressLine =
+                                        removeCountryString(
+                                                addresses.firstOrNull()?.getAddressLine(0)
+                                        )
                                 continuation.resume(addressLine)
                             }
                         }
                     }
                 } else {
                     @Suppress("DEPRECATION")
-                    val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+                    val addresses = geocoderWrapper.getFromLocation(latitude, longitude, 1)
                     removeCountryString(addresses?.firstOrNull()?.getAddressLine(0))
                 }
             } catch (e: Exception) {
